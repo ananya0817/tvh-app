@@ -1,18 +1,29 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, TextInput, FlatList, TouchableOpacity, ScrollView, ActivityIndicator, TouchableWithoutFeedback } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  TextInput,
+  FlatList,
+  TouchableOpacity,
+  ScrollView,
+  ActivityIndicator,
+} from "react-native";
 import axios from "axios";
-import styles from "./styles";
+import styles from "./showStyles";
 import { apiKey } from "./api_links";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useFocusEffect } from "@react-navigation/native";
-import { useRouter } from "expo-router"; // ✅ Import useRouter to navigate
-
+import { useRouter } from "expo-router";
 
 interface ShowTypes {
   id: number;
   name: string;
   poster_path: string;
   vote_average: number;
+  first_air_date: string;
+  last_air_date: string;
+  genre_ids: number[];
 }
 
 const Shows = () => {
@@ -37,17 +48,19 @@ const Shows = () => {
 
   const numColumns = 4;
 
+  // Fetch filters on mount
   useEffect(() => {
     fetchFilters();
-    fetchShows(true);
   }, []);
 
+  // Fetch shows when searchQuery or selectedFilters change
   useEffect(() => {
     setShowItems([]);
     setCurrentPage(1);
     fetchShows(true);
   }, [searchQuery, selectedFilters]);
 
+  // Reset filters on focus (optional)
   useFocusEffect(
     React.useCallback(() => {
       resetFilters();
@@ -80,11 +93,9 @@ const Shows = () => {
       });
 
       type ProviderType = { provider_id: number; provider_name: string };
-
       const validNetworks = networksResponse.data.results
         .filter((provider: ProviderType) => provider.provider_id && provider.provider_name)
         .map((provider: ProviderType) => ({ id: provider.provider_id, name: provider.provider_name }));
-
       setNetworks(validNetworks);
       setYears(Array.from({ length: 80 }, (_, i) => (2025 - i).toString()));
     } catch (error) {
@@ -100,10 +111,8 @@ const Shows = () => {
 
   const fetchShows = async (initialLoad = false) => {
     if (loading || currentPage > totalPages) return;
-
     try {
       setLoading(true);
-
       const endpoint = searchQuery
         ? "https://api.themoviedb.org/3/search/tv"
         : "https://api.themoviedb.org/3/discover/tv";
@@ -116,20 +125,23 @@ const Shows = () => {
         page: initialLoad ? 1 : currentPage,
       };
 
-      if (searchQuery) params.query = searchQuery;
-      if (selectedFilters.year !== "Year") params.first_air_date_year = selectedFilters.year;
-      if (selectedFilters.genre !== "Genre") {
-        const genre = genres.find((g) => g.name === selectedFilters.genre);
-        if (genre) params.with_genres = genre.id.toString();
-      }
-      if (selectedFilters.ratings !== "Ratings" && selectedFilters.ratings !== "") {
-        params["vote_average.gte"] = selectedFilters.ratings;
-      }
-      if (selectedFilters.service !== "Service") {
-        const network = networks.find((n) => n.name === selectedFilters.service);
-        if (network && network.id !== undefined) {
-          params.with_watch_providers = network.id.toString();
-          params.watch_region = "US";
+      if (searchQuery) {
+        params.query = searchQuery;
+      } else {
+        // For discover endpoint, pass filters directly
+        if (selectedFilters.year !== "Year") params.first_air_date_year = selectedFilters.year;
+        if (selectedFilters.genre !== "Genre") {
+          const genre = genres.find((g) => g.name === selectedFilters.genre);
+          if (genre) params.with_genres = genre.id.toString();
+        }
+        if (selectedFilters.ratings !== "Ratings" && selectedFilters.ratings !== "")
+          params["vote_average.gte"] = selectedFilters.ratings;
+        if (selectedFilters.service !== "Service") {
+          const network = networks.find((n) => n.name === selectedFilters.service);
+          if (network && network.id !== undefined) {
+            params.with_watch_providers = network.id.toString();
+            params.watch_region = "US";
+          }
         }
       }
 
@@ -138,11 +150,49 @@ const Shows = () => {
         headers: { accept: "application/json", Authorization: `Bearer ${apiKey}` },
       });
 
-      if (initialLoad) {
-        setShowItems(response.data.results);
-      } else {
-        setShowItems((prevItems) => [...prevItems, ...response.data.results]);
+      let newResults: ShowTypes[] = response.data.results;
+
+      // When searching, apply client-side filters
+      if (searchQuery) {
+        let filteredResults = newResults;
+        // Year filter: check if selected year is within [first_air_date, last_air_date]
+        if (selectedFilters.year !== "Year") {
+          const selectedYear = parseInt(selectedFilters.year, 10);
+          filteredResults = filteredResults.filter((item) => {
+            if (!item.first_air_date) return false;
+            const startYear = parseInt(item.first_air_date.substring(0, 4), 10);
+            const endYear = item.last_air_date
+              ? parseInt(item.last_air_date.substring(0, 4), 10)
+              : new Date().getFullYear();
+            return selectedYear >= startYear && selectedYear <= endYear;
+          });
+        }
+        // Genre filter
+        if (selectedFilters.genre !== "Genre") {
+          const genre = genres.find((g) => g.name === selectedFilters.genre);
+          if (genre) {
+            filteredResults = filteredResults.filter(
+              (item) =>
+                item.genre_ids && item.genre_ids.includes(genre.id)
+            );
+          }
+        }
+        // Ratings filter
+        if (selectedFilters.ratings !== "Ratings" && selectedFilters.ratings !== "") {
+          filteredResults = filteredResults.filter(
+            (item) => item.vote_average >= parseFloat(selectedFilters.ratings)
+          );
+        }
+        // (Service filtering may be skipped for search if data isn't present)
+        newResults = filteredResults;
       }
+
+      setShowItems((prevItems) => {
+        const existingIds = new Set(prevItems.map((item) => item.id));
+        const nonDuplicates = newResults.filter((item) => !existingIds.has(item.id));
+        return initialLoad ? nonDuplicates : [...prevItems, ...nonDuplicates];
+      });
+
       setTotalPages(response.data.total_pages);
       setCurrentPage((prevPage) => prevPage + 1);
     } catch (error) {
@@ -157,11 +207,15 @@ const Shows = () => {
   };
 
   const applyFilter = (filterType: keyof typeof selectedFilters, value: string) => {
-    setSelectedFilters({
-      ...selectedFilters,
-      [filterType]: value === "" ? defaultText[filterType] : value,
-    });
+    const newVal = value === "" ? defaultText[filterType] : value;
+    setSelectedFilters({ ...selectedFilters, [filterType]: newVal });
     setDropdownVisible("");
+    // If "None" is selected, force a re-fetch even if the filter already equals default.
+    if (value === "") {
+      setShowItems([]);
+      setCurrentPage(1);
+      fetchShows(true);
+    }
   };
 
   const defaultText = {
@@ -192,8 +246,17 @@ const Shows = () => {
               style={styles.filterButton}
               onPress={() => toggleDropdown(filterType as keyof typeof selectedFilters)}
             >
-              <Text style={[styles.filterText, selectedFilters[filterType as keyof typeof selectedFilters] !== defaultText[filterType as keyof typeof defaultText] ? styles.selectedFilterText : {}]} numberOfLines={1} ellipsizeMode="tail" >
-                {selectedFilters[filterType as keyof typeof selectedFilters]} 
+              <Text
+                style={[
+                  styles.filterText,
+                  selectedFilters[filterType as keyof typeof selectedFilters] !== defaultText[filterType as keyof typeof defaultText]
+                    ? styles.selectedFilterText
+                    : {},
+                ]}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                {selectedFilters[filterType as keyof typeof selectedFilters]}
               </Text>
             </TouchableOpacity>
             {index < 3 && <View style={styles.divider} />}
@@ -222,7 +285,12 @@ const Shows = () => {
       )}
 
       <Text style={styles.header}>
-        {searchQuery || Object.keys(selectedFilters).some(filterType => selectedFilters[filterType as keyof typeof selectedFilters] !== defaultText[filterType as keyof typeof defaultText])
+        {searchQuery ||
+        Object.keys(selectedFilters).some(
+          (filterType) =>
+            selectedFilters[filterType as keyof typeof selectedFilters] !==
+            defaultText[filterType as keyof typeof defaultText]
+        )
           ? "Search Results"
           : "Popular Shows This Week"}
       </Text>
@@ -233,9 +301,9 @@ const Shows = () => {
         keyExtractor={(item, index) => `${item.id}-${index}`}
         renderItem={({ item }) => (
           <View style={styles.show}>
-            <TouchableWithoutFeedback onPress={() => router.push(`/showInfo?showId=${item.id}`)}>  
+            <TouchableOpacity onPress={() => router.push({ pathname: "/showDetails", params: { showId: item.id } })}>
               <Image source={{ uri: `https://image.tmdb.org/t/p/w200/${item.poster_path}` }} style={styles.poster} />
-            </TouchableWithoutFeedback>
+            </TouchableOpacity>
           </View>
         )}
         onEndReached={() => fetchShows()}
