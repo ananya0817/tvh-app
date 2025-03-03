@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, Image, TextInput, FlatList, TouchableOpacity, ScrollView, ActivityIndicator, TouchableWithoutFeedback } from "react-native";
-import axios from "axios";
+import axios from 'axios';
 import styles from "./styles";
 import { apiKey } from "./api_links";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
