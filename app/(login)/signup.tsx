@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
 import {StyleSheet, View, Text, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, Alert} from 'react-native';
+import { useRouter } from 'expo-router';
+import { supabase } from '../../utils/supabase';
 
-interface SignupScreenProps {
-  navigation: {
-    navigate: (screen: string) => void;
-  };
-}
-
-const SignupScreen: React.FC<SignupScreenProps> = ({ navigation }) => {
+const SignupScreen: React.FC = () => {
+  const router = useRouter();
   const [signupForm, setSignupForm] = useState({
     email: '',
     username: '',
@@ -21,22 +18,35 @@ const SignupScreen: React.FC<SignupScreenProps> = ({ navigation }) => {
     }));
   };
   
-  const handleSignup = () => {
+  const handleSignup = async () => {
     // seeing if all fields are filled
-    if (!signupForm.email || !signupForm.username || !signupForm.password) {
+    if (!signupForm.email || !signupForm.password) { // removed username check for testing
       Alert.alert('Error', 'Please fill in all fields');
       return;
     }
     
-    console.log('Signup data:', signupForm);
-    
-    // DATABASE STUFF HERE????
-    
-    Alert.alert('Success', 'Account created successfully!', [
-      { text: 'OK', onPress: () => navigation.navigate('Login') }
-    ]);
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: signupForm.email,
+        password: signupForm.password,
+      });
+  
+      if (error) {
+        Alert.alert('Signup Error', error.message);
+        return;
+      }
+  
+      console.log('Signup successful:', data);
+      Alert.alert('Success', 'Account created successfully!', [
+        { text: 'OK', onPress: () => router.push('/(login)/login') }
+      ]);
+    } catch (err) {
+      console.error('Signup failed:', err);
+      Alert.alert('Signup Error', 'Something went wrong. Please try again.');
+    }
   };
   
+
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <KeyboardAvoidingView 
@@ -93,7 +103,7 @@ const SignupScreen: React.FC<SignupScreenProps> = ({ navigation }) => {
               Already have an account?{' '}
               <Text 
                 style={styles.link} 
-                onPress={() => navigation.navigate('Login')}
+                onPress={() => router.push('/login')}
               >
                 Sign in
               </Text>

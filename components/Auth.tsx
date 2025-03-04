@@ -2,8 +2,10 @@ import React, { useState } from 'react'
 import { Alert, View, Text, Button, StyleSheet, TextInput, ScrollView, TouchableOpacity, Dimensions, Image, KeyboardAvoidingView, Platform } from "react-native";
 import { supabase } from '../utils/supabase'
 import { Input } from '@rneui/themed'
+import { useRouter } from 'expo-router';
 
 export default function Auth() {
+  const router = useRouter();
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -15,7 +17,12 @@ export default function Auth() {
       password: password,
     })
 
-    if (error) Alert.alert(error.message)
+    if (error) { 
+      Alert.alert(error.message)
+    }
+    else {
+      router.replace('/(tabs)');
+    }
     setLoading(false)
   }
 
@@ -29,9 +36,12 @@ export default function Auth() {
       password: password,
     })
 
-    if (error) Alert.alert(error.message)
-    if (!session) Alert.alert('Please check your inbox for email verification!')
-    setLoading(false)
+    if (error) {
+      Alert.alert(error.message);
+    } else {
+      router.replace('/(tabs)');
+    }
+    setLoading(false);
   }
 
   return (
@@ -75,7 +85,7 @@ export default function Auth() {
                Don't have an account?{' '}
                <Text
                 style={styles.link}
-                onPress={() => signUpWithEmail()}
+                onPress={() => router.push('/(login)/signup')}
               >
                 Sign up
               </Text>
@@ -83,7 +93,7 @@ export default function Auth() {
           </View>
           <TouchableOpacity
                style={styles.button}
-               onPress={() => signUpWithEmail()}
+               onPress={() => signInWithEmail()}
              >
                <Text style={styles.buttonText}>Sign In</Text>
              </TouchableOpacity>
@@ -91,7 +101,8 @@ export default function Auth() {
           </View>
         </View>
         </KeyboardAvoidingView>
-     </ScrollView><View> </View></>
+     </ScrollView>
+     </>
   );
 };
 
