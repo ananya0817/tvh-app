@@ -1,13 +1,11 @@
 import { StyleSheet } from 'react-native';
-import ShowInfo from '@/components/Shows';
-import { Text, View } from '@/components/Themed';
+import ShowInfo from '@/components/ShowInfo';
+import { View } from '@/components/Themed';
 
-export default function ShowInfoScreen() {
+export default function ShowDetailsScreen() {
   return (
     <View style={styles.container}>
-        <Text>
-            <ShowInfo/>
-        </Text>
+        <ShowInfo/>
     </View>
   );
 }
@@ -17,6 +15,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: '#625161',
   },
   title: {
     fontSize: 20,
