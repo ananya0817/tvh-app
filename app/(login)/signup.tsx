@@ -20,7 +20,7 @@ const SignupScreen: React.FC = () => {
   
   const handleSignup = async () => {
     // seeing if all fields are filled
-    if (!signupForm.email || !signupForm.password) { // CHANGE BEFORE PUSHING
+    if (!signupForm.email || !signupForm.password) { // removed username check for testing
       Alert.alert('Error', 'Please fill in all fields');
       return;
     }
