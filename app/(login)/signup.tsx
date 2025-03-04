@@ -46,7 +46,7 @@ const SignupScreen: React.FC = () => {
     }
   };
   
-  
+
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <KeyboardAvoidingView 
