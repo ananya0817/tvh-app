@@ -7,7 +7,19 @@ const styles = StyleSheet.create({
     padding: 15,
   },
 
-  /* Header: Poster + Basic Info */
+  loadingContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(98, 81, 97, 0.5)",
+    zIndex: 999, 
+  },
+
+  /* poster and overview */
   headerContainer: {
     flexDirection: "row",
     alignItems: "flex-start",
@@ -40,7 +52,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
 
-  /* Full-Width Overview, Networks, Progress Bar */
+  /* overview, networks, & progress bar */
   fullWidthContainer: {
     width: "100%",
     backgroundColor: "#625161",
@@ -51,35 +63,41 @@ const styles = StyleSheet.create({
 
   overview: {
     fontSize: 14,
-    color: "white",
+    color: "#FFFFFF",
     marginBottom: 10,
   },
 
   networks: {
-    fontSize: 14,
-    color: "white",
-    fontWeight: "bold",
+    fontSize: 12,
+    color: "#FFFFFF",
+    marginBottom: 10,
   },
 
-  progressBarContainer: {
+  progressBarWrapper: {
     flexDirection: "row",
     alignItems: "center",
     width: "100%",
+    marginTop: 5,
+  },
+
+  progressBarContainer: {
+    width: "90%",
     height: 15,
     backgroundColor: "#D9D9D9",
     borderRadius: 20,
     overflow: "hidden",
-    marginTop: 5,
     elevation: 3,
+    zIndex: 5,
   },
 
   progressText: {
-    fontSize: 10,
-    color: "black",
-    marginLeft: 10,
+    fontSize: 11,
+    color: "white",
+    marginLeft: 8,
+    elevation: 3,
   },
 
-  /* Action Buttons: Watchlist, Write Review, Completed */
+  /* action buttons */
   actionContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
@@ -100,18 +118,18 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
 
-  /* Container for Seasons & Episodes (Fixed Width) */
+  /* seasons and episodes container */
   seasonsAndEpisodesContainer: {
-    width: 390,              // <=== FIXED WIDTH
-    alignSelf: "center",     // center horizontally
+    width: 390,
+    alignSelf: "center",
     backgroundColor: "#625161",
     marginTop: 10,
     borderRadius: 10,
   },
 
-  /* Season Dropdown (smaller, left-justified) */
+  /* dropdown for seasons */
   pickerContainer: {
-    width: 180,  // <=== smaller width
+    width: 180,
     backgroundColor: "#D9D9D9",
     marginBottom: 10,
     padding: 5,
@@ -124,7 +142,7 @@ const styles = StyleSheet.create({
     margin: -10,
   },
 
-  /* Season Rating + Review Section */
+  /* season rating & review */
   seasonRatingContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -174,11 +192,11 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
 
-  /* Episode Container (two lines) */
+  /* episode container */
   episodeContainer: {
     backgroundColor: "#998498",
     marginTop: 5,
-    width: 390, // <=== FIXED WIDTH for episodes
+    width: 390,
     alignSelf: "center",
     paddingVertical: 10,
     paddingHorizontal: 10,
@@ -190,7 +208,6 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
 
-  /* second line: comment icon, stars, checkmark */
   episodeSecondLine: {
     flexDirection: "row",
     alignItems: "center",

@@ -112,93 +112,106 @@ const Shows = () => {
   const fetchShows = async (initialLoad = false) => {
     if (loading || currentPage > totalPages) return;
     try {
-      setLoading(true);
-      const endpoint = searchQuery
-        ? "https://api.themoviedb.org/3/search/tv"
-        : "https://api.themoviedb.org/3/discover/tv";
+        setLoading(true);
+        const endpoint = searchQuery
+            ? "https://api.themoviedb.org/3/search/tv"
+            : "https://api.themoviedb.org/3/discover/tv";
 
-      const params: any = {
-        include_adult: "false",
-        include_null_first_air_dates: "false",
-        language: "en-US",
-        sort_by: "popularity.desc",
-        page: initialLoad ? 1 : currentPage,
-      };
+        const params: any = {
+            include_adult: "false",
+            include_null_first_air_dates: "false",
+            language: "en-US",
+            sort_by: "popularity.desc",
+            page: initialLoad ? 1 : currentPage,
+            watch_region: "US",
+        };
 
-      if (searchQuery) {
-        params.query = searchQuery;
-      } else {
-        // For discover endpoint, pass filters directly
-        if (selectedFilters.year !== "Year") params.first_air_date_year = selectedFilters.year;
-        if (selectedFilters.genre !== "Genre") {
-          const genre = genres.find((g) => g.name === selectedFilters.genre);
-          if (genre) params.with_genres = genre.id.toString();
+        if (searchQuery) {
+            params.query = searchQuery;
+        } else {
+            // For discover endpoint, pass filters directly
+            if (selectedFilters.year !== "Year") params.first_air_date_year = selectedFilters.year;
+            if (selectedFilters.genre !== "Genre") {
+                const genre = genres.find((g) => g.name === selectedFilters.genre);
+                if (genre) params.with_genres = genre.id.toString();
+            }
+            if (selectedFilters.ratings !== "Ratings" && selectedFilters.ratings !== "")
+                params["vote_average.gte"] = selectedFilters.ratings;
+
+            // Handle service/provider filter correctly
+            if (selectedFilters.service !== "Service") {
+                const network = networks.find((n) => n.name === selectedFilters.service);
+                if (network && network.id !== undefined) {
+                    params.with_watch_providers = network.id.toString();
+                }
+            } else {
+                // If no specific service is selected, fetch all US providers and filter.
+                if (!searchQuery){
+                  const providersResponse = await axios.get(
+                    'https://api.themoviedb.org/3/watch/providers/tv?language=en-US&watch_region=US',
+                    {
+                      headers: { accept: "application/json", Authorization: `Bearer ${apiKey}` },
+                    }
+                  );
+                  const usProviders = providersResponse.data.results.map((provider: { provider_id: any; }) => provider.provider_id).join('|');
+                  params.with_watch_providers = usProviders;
+                }
+            }
         }
-        if (selectedFilters.ratings !== "Ratings" && selectedFilters.ratings !== "")
-          params["vote_average.gte"] = selectedFilters.ratings;
-        if (selectedFilters.service !== "Service") {
-          const network = networks.find((n) => n.name === selectedFilters.service);
-          if (network && network.id !== undefined) {
-            params.with_watch_providers = network.id.toString();
-            params.watch_region = "US";
-          }
+
+        const response = await axios.get(endpoint, {
+            params,
+            headers: { accept: "application/json", Authorization: `Bearer ${apiKey}` },
+        });
+
+        let newResults: ShowTypes[] = response.data.results;
+
+        // When searching, apply client-side filters
+        if (searchQuery) {
+            let filteredResults = newResults;
+            // Year filter: check if selected year is within [first_air_date, last_air_date]
+            if (selectedFilters.year !== "Year") {
+                const selectedYear = parseInt(selectedFilters.year, 10);
+                filteredResults = filteredResults.filter((item) => {
+                    if (!item.first_air_date) return false;
+                    const startYear = parseInt(item.first_air_date.substring(0, 4), 10);
+                    const endYear = item.last_air_date
+                        ? parseInt(item.last_air_date.substring(0, 4), 10)
+                        : new Date().getFullYear();
+                    return selectedYear >= startYear && selectedYear <= endYear;
+                });
+            }
+            // Genre filter
+            if (selectedFilters.genre !== "Genre") {
+                const genre = genres.find((g) => g.name === selectedFilters.genre);
+                if (genre) {
+                    filteredResults = filteredResults.filter(
+                        (item) => item.genre_ids && item.genre_ids.includes(genre.id)
+                    );
+                }
+            }
+            // Ratings filter
+            if (selectedFilters.ratings !== "Ratings" && selectedFilters.ratings !== "") {
+                filteredResults = filteredResults.filter(
+                    (item) => item.vote_average >= parseFloat(selectedFilters.ratings)
+                );
+            }
+            // (Service filtering may be skipped for search if data isn't present)
+            newResults = filteredResults;
         }
-      }
 
-      const response = await axios.get(endpoint, {
-        params,
-        headers: { accept: "application/json", Authorization: `Bearer ${apiKey}` },
-      });
+        setShowItems((prevItems) => {
+            const existingIds = new Set(prevItems.map((item) => item.id));
+            const nonDuplicates = newResults.filter((item) => !existingIds.has(item.id));
+            return initialLoad ? nonDuplicates : [...prevItems, ...nonDuplicates];
+        });
 
-      let newResults: ShowTypes[] = response.data.results;
-
-      // When searching, apply client-side filters
-      if (searchQuery) {
-        let filteredResults = newResults;
-        // Year filter: check if selected year is within [first_air_date, last_air_date]
-        if (selectedFilters.year !== "Year") {
-          const selectedYear = parseInt(selectedFilters.year, 10);
-          filteredResults = filteredResults.filter((item) => {
-            if (!item.first_air_date) return false;
-            const startYear = parseInt(item.first_air_date.substring(0, 4), 10);
-            const endYear = item.last_air_date
-              ? parseInt(item.last_air_date.substring(0, 4), 10)
-              : new Date().getFullYear();
-            return selectedYear >= startYear && selectedYear <= endYear;
-          });
-        }
-        // Genre filter
-        if (selectedFilters.genre !== "Genre") {
-          const genre = genres.find((g) => g.name === selectedFilters.genre);
-          if (genre) {
-            filteredResults = filteredResults.filter(
-              (item) =>
-                item.genre_ids && item.genre_ids.includes(genre.id)
-            );
-          }
-        }
-        // Ratings filter
-        if (selectedFilters.ratings !== "Ratings" && selectedFilters.ratings !== "") {
-          filteredResults = filteredResults.filter(
-            (item) => item.vote_average >= parseFloat(selectedFilters.ratings)
-          );
-        }
-        // (Service filtering may be skipped for search if data isn't present)
-        newResults = filteredResults;
-      }
-
-      setShowItems((prevItems) => {
-        const existingIds = new Set(prevItems.map((item) => item.id));
-        const nonDuplicates = newResults.filter((item) => !existingIds.has(item.id));
-        return initialLoad ? nonDuplicates : [...prevItems, ...nonDuplicates];
-      });
-
-      setTotalPages(response.data.total_pages);
-      setCurrentPage((prevPage) => prevPage + 1);
+        setTotalPages(response.data.total_pages);
+        setCurrentPage((prevPage) => prevPage + 1);
     } catch (error) {
-      console.error("Error fetching shows:", error);
+        console.error("Error fetching shows:", error);
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
   };
 

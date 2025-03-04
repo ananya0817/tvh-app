@@ -32,7 +32,8 @@ export const useShowInfo = (showId: string | number, selectedSeason: number) => 
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [loading, setLoading] = useState(true);
   const [episodeLoading, setEpisodeLoading] = useState(false);
-  
+  const [mainSeriesEpisodeCount, setMainSeriesEpisodeCount] = useState<number>(0);
+  const [totalEpisodeCount, setTotalEpisodeCount] = useState<number>(0);
 
   useEffect(() => {
     const fetchShowDetails = async () => {
@@ -42,6 +43,18 @@ export const useShowInfo = (showId: string | number, selectedSeason: number) => 
           headers: { accept: "application/json", Authorization: `Bearer ${apiKey}` },
         });
         setShowDetails(response.data);
+
+        let mainCount = 0;
+        let totalCount = 0;
+        response.data.seasons.forEach((season: { season_number: number; episode_count: number }) => {
+          totalCount += season.episode_count;
+          if (season.season_number !== 0) {
+            mainCount += season.episode_count;
+          }
+        });
+        setMainSeriesEpisodeCount(mainCount);
+        setTotalEpisodeCount(totalCount);
+
       } catch (error) {
         console.error("Error fetching show details:", error);
       } finally {
@@ -73,5 +86,5 @@ export const useShowInfo = (showId: string | number, selectedSeason: number) => 
     fetchEpisodes();
   }, [showId, selectedSeason, showDetails]);
 
-  return { showDetails, episodes, loading, episodeLoading };
+  return { showDetails, episodes, loading, episodeLoading, mainSeriesEpisodeCount, totalEpisodeCount };
 };
