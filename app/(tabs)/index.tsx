@@ -5,12 +5,10 @@ const API_KEY = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJmNzNkNTIwZGJiZTBkM2Y4OTkxZDQyNz
 const BASE_URL = "https://api.themoviedb.org/3";
 const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
 
-const CATEGORIES = [
-  { title: "Popular TV Shows", endpoint: "/tv/popular" },
+const STATIC_CATEGORIES = [
+  { title: "Trending", endpoint: "/trending/tv/week" },
   { title: "Top Rated", endpoint: "/tv/top_rated" },
   { title: "Airing Today", endpoint: "/tv/airing_today" },
-  { title: "Trending", endpoint: "/trending/tv/week" },
-  { title: "On The Air", endpoint: "/tv/on_the_air" },
 ];
 
 export default function TVShowsScreen() {
@@ -18,10 +16,28 @@ export default function TVShowsScreen() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchTVShows = async () => {
+    const fetchTVData = async () => {
       try {
+        let categories = [...STATIC_CATEGORIES];
+
+        // Fetch TV genres dynamically
+        const genreResponse = await fetch(`${BASE_URL}/genre/tv/list`, {
+          headers: { Authorization: `Bearer ${API_KEY}` },
+        });
+        const genreData = await genreResponse.json();
+        const genres = genreData.genres.slice(0, 7);
+
+        // Add genres to categories
+        categories = categories.concat(
+          genres.map((genre: { name: any; id: any; }) => ({
+            title: genre.name,
+            endpoint: `/discover/tv?with_genres=${genre.id}`,
+          }))
+        );
+
+        // Fetch TV shows for each category
         const results = await Promise.all(
-          CATEGORIES.map(async (category) => {
+          categories.map(async (category) => {
             const response = await fetch(`${BASE_URL}${category.endpoint}`, {
               headers: { Authorization: `Bearer ${API_KEY}` },
             });
@@ -29,6 +45,7 @@ export default function TVShowsScreen() {
             return { title: category.title, data: data.results };
           })
         );
+
         setTvShows(results);
       } catch (error) {
         console.error("Error fetching TV shows:", error);
@@ -37,7 +54,7 @@ export default function TVShowsScreen() {
       }
     };
 
-    fetchTVShows();
+    fetchTVData();
   }, []);
 
   if (loading) return <ActivityIndicator size="large" style={styles.loader} />;
@@ -73,7 +90,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#625161",
-    paddingVertical: 10,
+    paddingVertical: 5,
   },
   loader: {
     flex: 1,
@@ -93,12 +110,12 @@ const styles = StyleSheet.create({
   },
   tvItem: {
     width: 110,
-    marginRight: 2,
+    marginRight: 5,
     alignItems: "center",
   },
   poster: {
-    width: 100,
-    height: 140,
+    width: 110,
+    height: 150,
     borderRadius: 10,
   },
   tvTitle: {
@@ -106,6 +123,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginTop: 5,
     textAlign: "center",
-    color: "#ffffff", // ✅ White text for visibility
+    color: "#ffffff",
   },
 });
