@@ -17,6 +17,7 @@ import reviewModalStyles from "./reviewModalStyles";
 import { useShowInfo } from "./useShowInfo";
 import { supabase } from "@/utils/supabase";
 import { BlurView } from "expo-blur"
+import { Session } from "@supabase/supabase-js";
 
 // review object
 interface Review {
@@ -84,8 +85,21 @@ const ShowInfo = () => {
   const [completionPercentage, setCompletionPercentage] = useState<number>(0);
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
 
-  // ananya user id
-  const userId = "478e8522-4b96-4542-b33c-0c801796df68";
+  // get user id
+  const [session, setSession] = useState<Session | null>(null)
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+    })
+
+    supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+    })
+  }, [])
+
+  // dynamic user id initialization
+  const userId = session?.user.id || "";
 
   // gets episode rating (entry with null comment_text) of episode
   const getEpisodeRatingRow = async (episodeNumber: number, seasonNumber: number): Promise<RatingRow | null> => {
