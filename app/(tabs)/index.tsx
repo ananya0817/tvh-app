@@ -99,13 +99,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#A99BA7",
   },
   categoryContainer: {
-    marginBottom: 20,
+    marginBottom: 15,
     paddingHorizontal: 5,
   },
   categoryTitle: {
     fontSize: 20,
     fontWeight: "bold",
-    marginBottom: 10,
+    marginBottom: 5,
     color: "#ffffff",
   },
   tvItem: {
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
   },
   poster: {
     width: 110,
-    height: 150,
+    height: 160,
     borderRadius: 10,
   },
   tvTitle: {
