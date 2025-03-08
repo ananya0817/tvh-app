@@ -29,9 +29,9 @@ const styles = StyleSheet.create({
   },
 
   poster: {
-    width: 96,
-    height: 144,
-    borderRadius: 2,
+    width: 110,
+    height: 160,
+    borderRadius: 10,
     padding: 0,
     elevation: 5,
   },
