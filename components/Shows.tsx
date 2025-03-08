@@ -15,6 +15,8 @@ import { apiKey } from "./api_links";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
+import { Session } from "@supabase/supabase-js";
+import { supabase } from "@/utils/supabase";
 
 interface ShowTypes {
   id: number;
@@ -48,19 +50,31 @@ const Shows = () => {
 
   const numColumns = 4;
 
-  // Fetch filters on mount
+  const [session, setSession] = useState<Session | null>(null);
+  const [userId, setUserId] = useState("");
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUserId(session?.user?.id || "");
+    });
+
+    supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      setUserId(session?.user?.id || "");
+    });
+  }, []);
+
   useEffect(() => {
     fetchFilters();
   }, []);
 
-  // Fetch shows when searchQuery or selectedFilters change
   useEffect(() => {
     setShowItems([]);
     setCurrentPage(1);
     fetchShows(true);
   }, [searchQuery, selectedFilters]);
 
-  // Reset filters on focus (optional)
   useFocusEffect(
     React.useCallback(() => {
       resetFilters();
@@ -129,7 +143,6 @@ const Shows = () => {
         if (searchQuery) {
             params.query = searchQuery;
         } else {
-            // For discover endpoint, pass filters directly
             if (selectedFilters.year !== "Year") params.first_air_date_year = selectedFilters.year;
             if (selectedFilters.genre !== "Genre") {
                 const genre = genres.find((g) => g.name === selectedFilters.genre);
@@ -138,14 +151,12 @@ const Shows = () => {
             if (selectedFilters.ratings !== "Ratings" && selectedFilters.ratings !== "")
                 params["vote_average.gte"] = selectedFilters.ratings;
 
-            // Handle service/provider filter correctly
             if (selectedFilters.service !== "Service") {
                 const network = networks.find((n) => n.name === selectedFilters.service);
                 if (network && network.id !== undefined) {
                     params.with_watch_providers = network.id.toString();
                 }
             } else {
-                // If no specific service is selected, fetch all US providers and filter.
                 if (!searchQuery){
                   const providersResponse = await axios.get(
                     'https://api.themoviedb.org/3/watch/providers/tv?language=en-US&watch_region=US',
@@ -166,10 +177,9 @@ const Shows = () => {
 
         let newResults: ShowTypes[] = response.data.results;
 
-        // When searching, apply client-side filters
         if (searchQuery) {
             let filteredResults = newResults;
-            // Year filter: check if selected year is within [first_air_date, last_air_date]
+
             if (selectedFilters.year !== "Year") {
                 const selectedYear = parseInt(selectedFilters.year, 10);
                 filteredResults = filteredResults.filter((item) => {
@@ -181,7 +191,7 @@ const Shows = () => {
                     return selectedYear >= startYear && selectedYear <= endYear;
                 });
             }
-            // Genre filter
+
             if (selectedFilters.genre !== "Genre") {
                 const genre = genres.find((g) => g.name === selectedFilters.genre);
                 if (genre) {
@@ -190,13 +200,13 @@ const Shows = () => {
                     );
                 }
             }
-            // Ratings filter
+
             if (selectedFilters.ratings !== "Ratings" && selectedFilters.ratings !== "") {
                 filteredResults = filteredResults.filter(
                     (item) => item.vote_average >= parseFloat(selectedFilters.ratings)
                 );
             }
-            // (Service filtering may be skipped for search if data isn't present)
+
             newResults = filteredResults;
         }
 
@@ -223,7 +233,7 @@ const Shows = () => {
     const newVal = value === "" ? defaultText[filterType] : value;
     setSelectedFilters({ ...selectedFilters, [filterType]: newVal });
     setDropdownVisible("");
-    // If "None" is selected, force a re-fetch even if the filter already equals default.
+
     if (value === "") {
       setShowItems([]);
       setCurrentPage(1);
@@ -251,7 +261,7 @@ const Shows = () => {
         placeholderTextColor={"black"}
       />
 
-      {/* Filter Buttons */}
+      {/* filters */}
       <View style={styles.filterContainer}>
         {["year", "genre", "ratings", "service"].map((filterType, index) => (
           <React.Fragment key={filterType}>
@@ -277,7 +287,7 @@ const Shows = () => {
         ))}
       </View>
 
-      {/* Scrollable Dropdown List */}
+      {/* dropdown list */}
       {dropdownVisible !== "" && (
         <ScrollView style={styles.dropdown} nestedScrollEnabled>
           <ScrollView style={{ maxHeight: 200 }} nestedScrollEnabled>
@@ -314,7 +324,7 @@ const Shows = () => {
         keyExtractor={(item, index) => `${item.id}-${index}`}
         renderItem={({ item }) => (
           <View style={styles.show}>
-            <TouchableOpacity onPress={() => router.push({ pathname: "/showDetails", params: { showId: item.id } })}>
+            <TouchableOpacity onPress={() => router.push({ pathname: "/showDetails", params: { showId: item.id, userId1: userId } })}>
               <Image source={{ uri: `https://image.tmdb.org/t/p/w200/${item.poster_path}` }} style={styles.poster} />
             </TouchableOpacity>
           </View>
