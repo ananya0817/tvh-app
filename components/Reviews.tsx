@@ -24,7 +24,9 @@ const Reviews = ({ current_user }: { current_user: string}) => {
                     .from("Reviews")
                     .select('id, season, review_text, rating, user, show_name, created_at, show_id')
                     .eq("user", current_user)
-                    .order("created_at", {ascending: false});
+                    .order("created_at", {ascending: false})
+                    .limit(3);
+
 
                 if (error) throw error;
                 console.log("Fetched reviews: ", data);
