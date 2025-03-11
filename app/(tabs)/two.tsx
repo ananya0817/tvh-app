@@ -1,13 +1,15 @@
 import { StyleSheet } from 'react-native';
 import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
+import Reviews from '@/components/Reviews';
+import ShowInfo from "@/components/ShowInfo";
+
 
 export default function TabFourScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>My Reviews</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/two.tsx" />
+      <Reviews current_user={"436e520e-c3f4-4678-affa-2f6c33497c61"}/>
     </View>
   );
 }
