@@ -17,7 +17,6 @@ import reviewModalStyles from "./reviewModalStyles";
 import { useShowInfo } from "./useShowInfo";
 import { supabase } from "@/utils/supabase";
 import { BlurView } from "expo-blur"
-import { Session } from "@supabase/supabase-js";
 
 // review object
 interface Review {
@@ -54,8 +53,9 @@ interface RatingRow {
 
 const ShowInfo = () => {
   // states for season info/ratings
-  const { showId } = useLocalSearchParams();
+  const { showId, userId1 } = useLocalSearchParams();
   const parsedShowId = Array.isArray(showId) ? showId[0] : showId;
+  const userId = Array.isArray(userId1) ? userId1[0] : userId1;
   const [selectedSeason, setSelectedSeason] = useState<number>(1);
   const {
     showDetails,
@@ -85,41 +85,27 @@ const ShowInfo = () => {
   const [completionPercentage, setCompletionPercentage] = useState<number>(0);
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
 
-  // get user id
-  const [session, setSession] = useState<Session | null>(null)
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-    })
-
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-    })
-  }, [])
-
-  // dynamic user id initialization
-  const userId = session?.user.id || "";
-
   // gets episode rating (entry with null comment_text) of episode
   const getEpisodeRatingRow = async (episodeNumber: number, seasonNumber: number): Promise<RatingRow | null> => {
-  const showIdNum = Number(parsedShowId);
-  const { data, error } = await supabase
-    .from("Comments")
-    .select("id, rating, completed")
-    .eq("show_id", showIdNum)
-    .eq("season", seasonNumber)
-    .eq("episode", episodeNumber)
-    .is("comment_text", null)
-    .order("created_at", { ascending: false })
-    .limit(1);
-  if (error) {
-    console.error(`getEpisodeRatingRow: Error fetching row for Episode ${episodeNumber} of Season ${seasonNumber}:`, error);
-    return null;
-  }
-  if (!data || data.length === 0) return null;
-  return data[0] as RatingRow;
-};
+    const showIdNum = Number(parsedShowId);
+    const { data, error } = await supabase
+      .from("Comments")
+      .select("id, rating, completed")
+      .eq("user", userId)
+      .eq("show_id", showIdNum)
+      .eq("season", seasonNumber)
+      .eq("episode", episodeNumber)
+      .is("comment_text", null)
+      .order("created_at", { ascending: false })
+      .limit(1);
+
+    if (error) {
+      console.error(`getEpisodeRatingRow: Error fetching row for Episode ${episodeNumber} of Season ${seasonNumber}:`, error);
+      return null;
+    }
+    if (!data || data.length === 0) return null;
+    return data[0] as RatingRow;
+  };
 
 // fetch rating for given season
 const fetchSeasonRating = async (seasonNumber: number) => {
@@ -127,6 +113,7 @@ const fetchSeasonRating = async (seasonNumber: number) => {
     const { data, error } = await supabase
       .from("Reviews")
       .select("rating")
+      .eq("user", userId)
       .eq("show_id", Number(parsedShowId))
       .eq("season", seasonNumber)
       .is("review_text", null)  // only gets entry with rating (null review_text)
@@ -160,6 +147,7 @@ const submitSeasonRating = async (seasonNumber: number, rating: number) => {
     const { data: existingRating, error: fetchError } = await supabase
       .from("Reviews")
       .select("id, rating")
+      .eq("user", userId)
       .eq("show_id", showIdNum)
       .eq("season", seasonNumber)
       .is("review_text", null)
@@ -236,7 +224,7 @@ const submitEpisodeRating = async (episodeNumber: number, newRating: number) => 
 
     const existing = await getEpisodeRatingRow(episodeNumber, selectedSeason);
     if (existing) {
-      console.log(`✅ Found rating row (ID: ${existing.id}) for ep ${episodeNumber} of Season ${selectedSeason}. Updating rating to ${newRating}...`);
+      console.log(`Found rating row (ID: ${existing.id}) for ep ${episodeNumber} of Season ${selectedSeason}. Updating rating to ${newRating}...`);
       const { error: updateError } = await supabase
         .from("Comments")
         .update({ rating: newRating })
@@ -246,7 +234,7 @@ const submitEpisodeRating = async (episodeNumber: number, newRating: number) => 
         return;
       }
     } else {
-      console.log(`⚠️ No rating row found for ep ${episodeNumber} of Season ${selectedSeason}. Inserting new rating row with rating ${newRating}...`);
+      console.log(`No rating row found for ep ${episodeNumber} of Season ${selectedSeason}. Inserting new rating row with rating ${newRating}...`);
       const { error: insertError } = await supabase
         .from("Comments")
         .insert([
@@ -284,17 +272,18 @@ const toggleEpisodeCompletion = async (episodeNumber: number) => {
     const existing = await getEpisodeRatingRow(episodeNumber, selectedSeason);
     if (existing) {
       const newStatus = !existing.completed;
-      console.log(`✅ Toggling completion for ep ${episodeNumber} of Season ${selectedSeason} to ${newStatus}...`);
+      console.log(`Toggling completion for ep ${episodeNumber} of Season ${selectedSeason} to ${newStatus}...`);
       const { error: updateError } = await supabase
         .from("Comments")
         .update({ completed: newStatus })
+        .eq("user", userId)
         .eq("id", existing.id);
       if (updateError) {
         console.error(`Error toggling completion for Episode ${episodeNumber} of Season ${selectedSeason}:`, updateError);
         return;
       }
     } else {
-      console.log(`⚠️ No rating row for ep ${episodeNumber} of Season ${selectedSeason}. Inserting new row with completed=true...`);
+      console.log(`No rating row for ep ${episodeNumber} of Season ${selectedSeason}. Inserting new row with completed=true...`);
       const { error: insertError } = await supabase
         .from("Comments")
         .insert([
@@ -333,6 +322,7 @@ const toggleAllEpisodesCompletion = async () => {
     const { data, error } = await supabase
       .from("Comments")
       .select("completed")
+      .eq("user", userId)
       .eq("show_id", showIdNum)
       .is("comment_text", null);
 
@@ -360,6 +350,7 @@ const toggleAllEpisodesCompletion = async () => {
           const { error: updateError } = await supabase
             .from("Comments")
             .update({ completed: newStatus, rating: updatedRating })
+            .eq("user", userId)
             .eq("id", existing.id);
           if (updateError) {
             console.error(
@@ -374,7 +365,7 @@ const toggleAllEpisodesCompletion = async () => {
         } else {
           // insert new row if it doesn't exist
           console.log(
-            `⚠️ No rating row for Season ${seasonNumber} Episode ${epNum}. Inserting new row with completed=${newStatus}...`
+            `No rating row for Season ${seasonNumber} Episode ${epNum}. Inserting new row with completed=${newStatus}...`
           );
           const { error: insertError } = await supabase
             .from("Comments")
@@ -426,6 +417,7 @@ const toggleAllEpisodesCompletion = async () => {
         const { data, error } = await supabase
             .from("Comments")
             .select("episode, completed, season")
+            .eq("user", userId)
             .eq("show_id", showIdNum)
             .is("comment_text", null);
 
@@ -466,7 +458,9 @@ const toggleAllEpisodesCompletion = async () => {
       const { data, error } = await supabase
         .from("Reviews")
         .select("*")
+        .eq("user", userId)
         .eq("show_id", Number(parsedShowId))
+        .neq("review_text", null)
         .order("created_at", { ascending: false });
       console.log("hi");
       if (error) throw error;
@@ -506,6 +500,7 @@ const toggleAllEpisodesCompletion = async () => {
       const { data, error } = await supabase
         .from("Comments")
         .select("*")
+        .eq("user", userId)
         .eq("show_id", Number(parsedShowId))
         .eq("season", selectedSeason)
         .neq("comment_text", null)
@@ -575,14 +570,6 @@ const toggleAllEpisodesCompletion = async () => {
     setCommentsModalVisible(true);
     await fetchComments(episodeNumber);
   };
-
-  if (loading) {
-    return (
-      <View style={[styles.container, { justifyContent: "center", alignItems: "center" }]}>
-        <ActivityIndicator size="large" color="black" />
-      </View>
-    );
-  }
 
   return (
     <View>
@@ -791,9 +778,9 @@ const toggleAllEpisodesCompletion = async () => {
             {/* season dropdown and rating */}
             <View style={styles.seasonsAndEpisodesContainer}>
               <View style={styles.pickerContainer}>
-                <Picker selectedValue={selectedSeason} onValueChange={(itemValue) => setSelectedSeason(itemValue)} style={styles.picker}>
+                <Picker selectedValue={selectedSeason} onValueChange={(itemValue) => setSelectedSeason(Number(itemValue))} style={styles.picker}>
                   {showDetails?.seasons.map((season) => (
-                    <Picker.Item key={season.season_number} label={season.name} value={season.season_number} />
+                    <Picker.Item key={season.season_number} label={season.name} value={season.season_number.toString()} />
                   ))}
                 </Picker>
               </View>
@@ -860,7 +847,7 @@ const toggleAllEpisodesCompletion = async () => {
         ListFooterComponent={episodeLoading ? <ActivityIndicator size="large" color="black" /> : null}
       />
       {/* loading screen */}
-      {isUpdating && (
+      {(isUpdating) && (
         <BlurView style={styles.loadingContainer}
           tint="dark"
           intensity={35}
