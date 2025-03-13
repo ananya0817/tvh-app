@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../../utils/supabase'
 import { Session } from '@supabase/supabase-js'
 import Reviews from '@/components/Reviews';
+import { router } from 'expo-router';
 
 export default function TabFiveScreen() {
     const [session, setSession] = useState<Session | null>(null);
@@ -49,7 +50,9 @@ export default function TabFiveScreen() {
 
             <View style={styles.reviews}>
                 <Text style={styles.header}>Recent Reviews</Text>
-                <TouchableOpacity>
+                <TouchableOpacity
+                onPress={() => router.push('/two')}
+                >
                     <Text style={styles.viewMore}>View More</Text>
                 </TouchableOpacity>
             </View>
@@ -118,22 +121,6 @@ const styles = StyleSheet.create({
     viewMore: {
         fontSize: 16,
         color: 'white',
-    },
-    reviewBox: {
-        padding: 10,
-    },
-    reviewText: {
-        fontSize: 14,
-        color: '#fff',
-        marginTop: 5,
-    },
-    reviewDivider: {
-        backgroundColor: 'white',
-        alignSelf: 'center',
-        height: 1,
-        width: '95%',
-        marginTop: 2,
-        marginBottom: 2,
     },
 });
 

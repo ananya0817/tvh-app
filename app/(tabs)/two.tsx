@@ -5,6 +5,7 @@ import { Session } from "@supabase/supabase-js";
 import { supabase } from "@/utils/supabase";
 import {useEffect, useState} from "react";
 import {useRouter} from "expo-router";
+import Reviews from '@/components/Reviews';
 
 export default function two() {
     const [session, setSession] = useState<Session | null>(null);
@@ -25,6 +26,7 @@ export default function two() {
     return (
         <View style={styles.container}>
           <Text style={styles.title}>My Reviews</Text>
+          <Reviews current_user={session?.user?.id || ""}/>
         </View>
     );
 };
@@ -32,6 +34,7 @@ export default function two() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#8d7a8e',
     alignItems: 'center',
     justifyContent: 'center',
   },

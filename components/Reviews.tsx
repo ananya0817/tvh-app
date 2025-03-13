@@ -48,18 +48,36 @@ const Reviews = ({ current_user }: { current_user: string}) => {
     if (!reviews.length) return <Text>No reviews found.</Text>;
 
     return (
-        <View style={styles.container}>
+        <View>
             {reviews.map((review) => (
                 <View key={review.id} style={styles.reviewBox}>
                     <Text style={styles.reviewText}>Show Title {review.show_name}</Text>
                     <Text style={styles.reviewText}>Season # {review.season}</Text>
                     <Text style={styles.reviewText}>Rating: {review.rating}</Text>
                     <Text style={styles.reviewText}>{review.review_text}</Text>
+                    <View style={styles.reviewDivider} />
                 </View>
             ))}
-            <View style={styles.reviewDivider} />
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    reviewBox: {
+        padding: 5,
+    },
+    reviewText: {
+        fontSize: 14,
+        color: '#fff',
+    },
+    reviewDivider: {
+        backgroundColor: 'white',
+        alignSelf: 'center',
+        height: 1,
+        width: '95%',
+        marginTop: 5,
+        marginBottom: 5,
+    },
+})
 
 export default Reviews;
