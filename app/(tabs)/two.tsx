@@ -25,8 +25,8 @@ export default function two() {
 
     return (
         <View style={styles.container}>
-          <Text style={styles.title}>My Reviews</Text>
-          <Reviews current_user={session?.user?.id || ""}/>
+          {/*<Text style={styles.title}>My Reviews</Text>*/}
+          {/*<Reviews current_user={session?.user?.id || ""}/>*/}
         </View>
     );
 };

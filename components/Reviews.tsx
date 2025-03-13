@@ -12,7 +12,11 @@ interface Review {
     review_text: string;
     rating: number;
 }
-const Reviews = ({ current_user }: { current_user: string}) => {
+interface ReviewsProps {
+    current_user: string;
+    more: boolean;
+}
+const Reviews: React.FC<ReviewsProps> = ({ current_user, more }) => {
     const [reviews, setReviews] = useState<Review[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -20,18 +24,20 @@ const Reviews = ({ current_user }: { current_user: string}) => {
         const fetchReviews = async () => {
             if (!current_user) return;
             try {
-                const { data, error } = await supabase
+                let query = supabase
                     .from("Reviews")
                     .select('id, season, review_text, rating, user, show_name, created_at, show_id')
                     .eq("user", current_user)
                     .order("created_at", {ascending: false})
-                    .limit(3);
 
+                if (!more){
+                    query = query.limit(3);
+                }
+
+                const { data, error } = await query;
 
                 if (error) throw error;
-                console.log("Fetched reviews: ", data);
                 setReviews([... data]);
-                console.log("State, update, reviews: ", data);
             }catch (error){
                 console.error("Error fetching reviews:", error);
             } finally {
@@ -42,7 +48,7 @@ const Reviews = ({ current_user }: { current_user: string}) => {
         };
         fetchReviews();
 
-    }, [current_user]);
+    }, [current_user, more]);
 
     if (loading) return <Text>Loading...</Text>;
     if (!reviews.length) return <Text>No reviews found.</Text>;

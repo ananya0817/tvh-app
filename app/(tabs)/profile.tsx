@@ -56,7 +56,7 @@ export default function TabFiveScreen() {
                     <Text style={styles.viewMore}>View More</Text>
                 </TouchableOpacity>
             </View>
-            <Reviews current_user={session?.user?.id || ""}/>
+            <Reviews current_user={session?.user?.id || ""} more={false}/>
         </View>
     );
 }
