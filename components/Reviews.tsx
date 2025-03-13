@@ -57,7 +57,7 @@ const Reviews: React.FC<ReviewsProps> = ({ current_user, more }) => {
         <View>
             {reviews.map((review) => (
                 <View key={review.id} style={styles.reviewBox}>
-                    <Text style={styles.reviewText}>Show Title {review.show_name}</Text>
+                    <Text style={styles.reviewShowTitle}>{review.show_name}</Text>
                     <Text style={styles.reviewText}>Season # {review.season}</Text>
                     <Text style={styles.reviewText}>Rating: {review.rating}</Text>
                     <Text style={styles.reviewText}>{review.review_text}</Text>
@@ -71,6 +71,11 @@ const Reviews: React.FC<ReviewsProps> = ({ current_user, more }) => {
 const styles = StyleSheet.create({
     reviewBox: {
         padding: 5,
+    },
+    reviewShowTitle:{
+        fontSize: 15,
+        color: '#fff',
+        fontWeight: 'bold',
     },
     reviewText: {
         fontSize: 14,

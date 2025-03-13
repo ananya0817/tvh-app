@@ -3,7 +3,7 @@ import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
 import { Session } from "@supabase/supabase-js";
 import { supabase } from "@/utils/supabase";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useRouter} from "expo-router";
 import Reviews from '@/components/Reviews';
 
@@ -25,8 +25,8 @@ export default function two() {
 
     return (
         <View style={styles.container}>
-          {/*<Text style={styles.title}>My Reviews</Text>*/}
-          {/*<Reviews current_user={session?.user?.id || ""}/>*/}
+            <Text style={styles.title}>My Reviews</Text>
+            <Reviews current_user={session?.user?.id || ""} more={true}/>
         </View>
     );
 };
