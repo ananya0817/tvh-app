@@ -38,7 +38,7 @@ const SignupScreen: React.FC = () => {
   
       console.log('Signup successful:', data);
       Alert.alert('Success', 'Account created successfully!', [
-        { text: 'OK', onPress: () => router.push('/(login)/login') }
+        { text: 'OK', onPress: () => router.push('/(login)/quiz') }
       ]);
     } catch (err) {
       console.error('Signup failed:', err);
