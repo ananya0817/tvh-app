@@ -48,7 +48,7 @@ const Shows = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const numColumns = 4;
+  const numColumns = 3;
 
   const [session, setSession] = useState<Session | null>(null);
   const [userId, setUserId] = useState("");
