@@ -124,16 +124,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   title: {
-    fontSize: 24,
+    fontSize: 40,
     fontWeight: 'bold',
     color: 'white',
-    marginBottom: 10,
+    marginBottom: 50,
     textAlign: 'center',
   },
   text: {
     color: 'white',
-    fontSize: 16,
-    marginBottom: 20,
+    fontSize: 20,
+    marginBottom: 16,
     textAlign: 'center',
   },
   formContainer: {

@@ -3,7 +3,7 @@ import {StyleSheet, View, Text, TouchableOpacity, Image} from 'react-native';
 import { useRouter } from 'expo-router';
 
 // logo
-const TVLogo = require('../../assets/images/logo.png'); 
+const TVLogo = require('../../assets/images/logo-Photoroom.png'); 
 const WelcomeScreen: React.FC = () => {
 const router = useRouter();
   
@@ -50,33 +50,40 @@ const styles = StyleSheet.create({
     height: 120,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 80,
   },
   logo: {
-    width: '100%',
-    height: '100%',
+    width: '300%',
+    height: '300%',
   },
   text: {
     color: 'white',
-    fontSize: 16,
+    fontSize: 25,
     marginBottom: 20,
     textAlign: 'center',
   },
   button: {
-    backgroundColor: '#222',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     borderRadius: 5,
-    paddingVertical: 12,
+    paddingVertical: 30,
     alignItems: 'center',
     marginVertical: 10,
     width: '100%',
+    marginBottom: 30,
   },
   buttonText: {
     color: 'white',
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: '500',
   },
   secondaryButton: {
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 5,
+    paddingVertical: 30,
+    alignItems: 'center',
+    marginVertical: 10,
+    width: '100%',
+    marginBottom: 70,
   },
 });
 

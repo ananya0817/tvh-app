@@ -4,6 +4,9 @@ import { supabase } from '../utils/supabase'
 import { Input } from '@rneui/themed'
 import { useRouter } from 'expo-router';
 
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
+
 export default function Auth() {
   const router = useRouter();
   const [email, setEmail] = useState('')
@@ -60,7 +63,7 @@ export default function Auth() {
               <Input
                 style={styles.input}
                 placeholderTextColor="#aaa"
-                leftIcon={{ type: 'font-awesome', name: 'envelope' }}
+                // leftIcon={{ type: 'font-awesome', name: 'envelope' }}
                 onChangeText={(text: string) => setEmail(text)}
                 value={email}
                 placeholder="email@address.com"
@@ -72,7 +75,7 @@ export default function Auth() {
             <Input
               style={styles.input}
               //label="Password"
-              leftIcon={{ type: 'font-awesome', name: 'lock' }}
+              // leftIcon={{ type: 'font-awesome', name: 'lock' }}
               onChangeText={(text: string) => setPassword(text)}
               value={password}
               secureTextEntry={true}
@@ -80,8 +83,15 @@ export default function Auth() {
               autoCapitalize={'none'}
             />
           </View>
+          <TouchableOpacity
+               style={styles.button}
+               onPress={() => signInWithEmail()}
+             >
+               <Text style={styles.buttonText}>Sign In</Text>
+          </TouchableOpacity>
+          </View>
           <View style={styles.bottomTextContainer}>
-             <Text style={styles.bottomText}>
+             <Text numberOfLines={1} style={styles.bottomText}>
                Don't have an account?{' '}
                <Text
                 style={styles.link}
@@ -91,17 +101,9 @@ export default function Auth() {
               </Text>
             </Text>
           </View>
-          <TouchableOpacity
-               style={styles.button}
-               onPress={() => signInWithEmail()}
-             >
-               <Text style={styles.buttonText}>Sign In</Text>
-             </TouchableOpacity>
-             
-          </View>
         </View>
-        </KeyboardAvoidingView>
-     </ScrollView>
+    </KeyboardAvoidingView>
+    </ScrollView>
      </>
   );
 };
@@ -110,28 +112,31 @@ const styles = StyleSheet.create({
   screen: {
     backgroundColor: '#8d7a8e',
     flex: 1,
-    padding: 150,
+    padding: 30,
     alignItems: 'center',
     justifyContent: 'center',
+    width: windowWidth,
+    height: windowHeight,
   },
   title: {
-    fontSize: 24,
+    fontSize: 40,
     fontWeight: 'bold',
     color: 'white',
-    marginBottom: 10,
+    marginBottom: 50,
+    // marginTop: 200,
     textAlign: 'center',
   },
   text: {
     color: 'white',
-    fontSize: 16,
-    marginBottom: 20,
+    fontSize: 20,
+    marginBottom: 16,
     textAlign: 'center',
   },
   formContainer: {
     backgroundColor: 'rgba(255, 255, 255, 0.15)',
-    padding: 0,
+    padding: 20,
     borderRadius: 10,
-    width: '350%',
+    width: '100%',
     marginVertical: 10,
   },
   formGroup: {
@@ -163,6 +168,7 @@ const styles = StyleSheet.create({
   },
   bottomTextContainer: {
     marginTop: 15,
+    // width: '100%',
   },
   bottomText: {
     color: 'white',
@@ -175,20 +181,20 @@ const styles = StyleSheet.create({
   centered: {
     textAlign: 'center',
   },
-  container: {
-    marginTop: 40,
-    backgroundColor: '#8d7a8e',
-    flex: 1,
-    padding: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  verticallySpaced: {
-    paddingTop: 4,
-    paddingBottom: 4,
-    alignSelf: 'stretch',
-  },
-  mt20: {
-    marginTop: 20,
-  }
+  // container: {
+  //   marginTop: 40,
+  //   backgroundColor: '#8d7a8e',
+  //   flex: 1,
+  //   padding: 30,
+  //   alignItems: 'center',
+  //   justifyContent: 'center',
+  // },
+  // verticallySpaced: {
+  //   paddingTop: 4,
+  //   paddingBottom: 4,
+  //   alignSelf: 'stretch',
+  // },
+  // mt20: {
+  //   marginTop: 20,
+  // }
 });
