@@ -1,20 +1,40 @@
 import { StyleSheet } from 'react-native';
 import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
+import { Session } from "@supabase/supabase-js";
+import { supabase } from "@/utils/supabase";
+import {useEffect, useState} from "react";
+import {useRouter} from "expo-router";
+import Reviews from '@/components/Reviews';
 
-export default function TabFourScreen() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>My Reviews</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/two.tsx" />
-    </View>
-  );
-}
+export default function two() {
+    const [session, setSession] = useState<Session | null>(null);
+    const [userId, setUserId] = useState("");
+
+    useEffect(() => {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        setSession(session);
+        setUserId(session?.user?.id || "");
+      })
+
+      supabase.auth.onAuthStateChange((_event, session) => {
+        setSession(session);
+        setUserId(session?.user?.id || "");
+      });
+    }, [])
+
+    return (
+        <View style={styles.container}>
+          <Text style={styles.title}>My Reviews</Text>
+          <Reviews current_user={session?.user?.id || ""}/>
+        </View>
+    );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#8d7a8e',
     alignItems: 'center',
     justifyContent: 'center',
   },
