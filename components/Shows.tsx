@@ -46,7 +46,7 @@ const Shows = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const numColumns = 4;
+  const numColumns = 3;
 
   // Fetch filters on mount
   useEffect(() => {
