@@ -58,7 +58,6 @@ export default function Auth() {
           <Text style={styles.text}>Welcome back!</Text>
           <View style={styles.formContainer}>
             <View style={styles.formGroup}>
-            <View style={[styles.verticallySpaced, styles.mt20]}></View>
               <Text style={styles.label}>Email</Text>
               <Input
                 style={styles.input}
