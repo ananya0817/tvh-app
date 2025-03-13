@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Text, View } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { supabase } from "../utils/supabase";
 
 interface Review {
@@ -48,16 +48,18 @@ const Reviews = ({ current_user }: { current_user: string}) => {
     if (!reviews.length) return <Text>No reviews found.</Text>;
 
     return (
-        <View>
+        <View style={styles.container}>
             {reviews.map((review) => (
-                <View key={review.id}>
-                    <Text style={{ fontSize: 12, fontWeight: "bold", color: 'white' }}>Show: {review.show_name}</Text>
-                    <Text style={{ fontSize: 12, fontWeight: "bold", color: 'white' }}>Season: {review.season}</Text>
-                    <Text style={{ fontSize: 12, fontWeight: "bold", color: 'white' }}>Rating: {review.rating}</Text>
-                    <Text style={{ fontSize: 12, fontWeight: "bold", color: 'white' }}>Review: {review.review_text}</Text>
+                <View key={review.id} style={styles.reviewBox}>
+                    <Text style={styles.reviewText}>Show Title {review.show_name}</Text>
+                    <Text style={styles.reviewText}>Season # {review.season}</Text>
+                    <Text style={styles.reviewText}>Rating: {review.rating}</Text>
+                    <Text style={styles.reviewText}>{review.review_text}</Text>
                 </View>
             ))}
+            <View style={styles.reviewDivider} />
         </View>
     );
 };
+
 export default Reviews;

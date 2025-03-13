@@ -27,7 +27,7 @@
     "@types/aes-js": "^3.1.4",
     "@types/react-native-elements": "^0.16.4",
     "aes-js": "^3.1.2",
-    "axios": "^1.8.2",
+    "axios": "^1.8.3",
     "expo": "~52.0.35",
     "expo-blur": "~14.0.3",
     "expo-font": "~13.0.3",

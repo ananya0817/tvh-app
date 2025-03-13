@@ -1,7 +1,6 @@
 import { StyleSheet } from 'react-native';
 import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
-import Reviews from '@/components/Reviews';
 import { Session } from "@supabase/supabase-js";
 import { supabase } from "@/utils/supabase";
 import {useEffect, useState} from "react";
@@ -26,7 +25,6 @@ export default function two() {
     return (
         <View style={styles.container}>
           <Text style={styles.title}>My Reviews</Text>
-          <Reviews current_user={session?.user?.id || ""}/>
         </View>
     );
 };

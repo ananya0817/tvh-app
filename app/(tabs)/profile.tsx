@@ -2,6 +2,7 @@ import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../utils/supabase'
 import { Session } from '@supabase/supabase-js'
+import Reviews from '@/components/Reviews';
 
 export default function TabFiveScreen() {
     const [session, setSession] = useState<Session | null>(null);
@@ -52,22 +53,10 @@ export default function TabFiveScreen() {
                     <Text style={styles.viewMore}>View More</Text>
                 </TouchableOpacity>
             </View>
-            <View style={styles.reviewBox}>
-                <Text style={styles.reviewText}>Show Title</Text>
-                <Text style={styles.reviewText}>Season #</Text>
-                <Text style={styles.reviewText}>This is a sample description of a review.</Text>
-            </View>
-            <View style={styles.reviewDivider} />
-            <View style={styles.reviewBox}>
-                <Text style={styles.reviewText}>Show Title</Text>
-                <Text style={styles.reviewText}>Season #</Text>
-                <Text style={styles.reviewText}>This is a sample description of a review.</Text>
-            </View>
-            <View style={styles.reviewDivider} />
+            <Reviews current_user={session?.user?.id || ""}/>
         </View>
     );
 }
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -147,3 +136,4 @@ const styles = StyleSheet.create({
         marginBottom: 2,
     },
 });
+
