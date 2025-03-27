@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -17,6 +17,7 @@ import reviewModalStyles from "./reviewModalStyles";
 import { useShowInfo } from "./useShowInfo";
 import { supabase } from "@/utils/supabase";
 import { BlurView } from "expo-blur"
+import WatchlistPopup from "./watchlistPopup";
 
 // review object
 interface Review {
@@ -462,7 +463,6 @@ const toggleAllEpisodesCompletion = async () => {
         .eq("show_id", Number(parsedShowId))
         .neq("review_text", null)
         .order("created_at", { ascending: false });
-      console.log("hi");
       if (error) throw error;
       setReviews(data || []);
     } catch (error) {
@@ -750,10 +750,13 @@ const toggleAllEpisodesCompletion = async () => {
 
             {/* action buttons */}
             <View style={styles.actionContainer}>
-              <TouchableOpacity style={styles.actionButton}>
-                <FontAwesome name="play-circle" size={30} color="white" />
-                <Text style={styles.actionText}>Watchlist</Text>
-              </TouchableOpacity>
+              <WatchlistPopup 
+                userId={userId}
+                showId={Number(parsedShowId)}
+                showName={showDetails?.name || "Unknown Show"}
+                onStatusChange={(status) => {
+                }}
+              />
               <TouchableOpacity style={styles.actionButton} onPress={() => openReviewModal("show")}>
                 <FontAwesome name="pencil" size={30} color="white" />
                 <Text style={styles.actionText}>Write Review</Text>
