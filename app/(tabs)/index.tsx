@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, Image, ActivityIndicator, StyleSheet } from "react-native";
+import { View, Text, FlatList, Image, ActivityIndicator, StyleSheet, TouchableOpacity } from "react-native";
+import { useRouter } from 'expo-router';
+import axios from 'axios';
+import { apiKey } from "@/components/api_links";
+import { Session } from "@supabase/supabase-js";
+import { supabase } from "@/utils/supabase";
 
-const API_KEY = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJmNzNkNTIwZGJiZTBkM2Y4OTkxZDQyNzE0Nzc3OTg0MiIsIm5iZiI6MTc0MDA3Nzg3My4yOTUsInN1YiI6IjY3Yjc3YjMxNzQzNDIwMGMyODIyMjg5NSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.FxaiajUg3femit8Gz5qPKAk2e7jNv5GizkRRPbE99TQ'; // Replace with your TMDB API Key
 const BASE_URL = "https://api.themoviedb.org/3";
 const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
 
@@ -12,37 +16,82 @@ const STATIC_CATEGORIES = [
 ];
 
 export default function TVShowsScreen() {
+  const router = useRouter();
   const [tvShows, setTvShows] = useState<{ title: string; data: any[] }[]>([]);
   const [loading, setLoading] = useState(true);
+  const [usProviders, setUsProviders] = useState<string>("");
+
+  const [session, setSession] = useState<Session | null>(null);
+    const [userId, setUserId] = useState("");
+  
+    useEffect(() => {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        setSession(session);
+        setUserId(session?.user?.id || "");
+      })
+  
+      supabase.auth.onAuthStateChange((_event, session) => {
+        setSession(session);
+        setUserId(session?.user?.id || "");
+      });
+    }, [])
 
   useEffect(() => {
+    const fetchUSProviders = async () => {
+      try {
+        const response = await axios.get(
+          'https://api.themoviedb.org/3/watch/providers/tv',
+          {
+            params: { language: 'en-US', watch_region: 'US' },
+            headers: { Authorization: `Bearer ${apiKey}` },
+          }
+        );
+        const providers = response.data.results.map((p: { provider_id: string }) => p.provider_id).join('|');
+        setUsProviders(providers);
+      } catch (error) {
+        console.error("Error fetching providers:", error);
+      }
+    };
+
     const fetchTVData = async () => {
       try {
+        await fetchUSProviders();
+        if (!usProviders) return;
+
         let categories = [...STATIC_CATEGORIES];
 
-        // Fetch TV genres dynamically
-        const genreResponse = await fetch(`${BASE_URL}/genre/tv/list`, {
-          headers: { Authorization: `Bearer ${API_KEY}` },
+        // Fetch TV genres
+        const genreResponse = await axios.get(`${BASE_URL}/genre/tv/list`, {
+          headers: { Authorization: `Bearer ${apiKey}` },
         });
-        const genreData = await genreResponse.json();
-        const genres = genreData.genres.slice(0, 7);
+        const genres = genreResponse.data.genres.slice(0, 7);
 
-        // Add genres to categories
+        // Add genre categories
         categories = categories.concat(
-          genres.map((genre: { name: any; id: any; }) => ({
+          genres.map((genre: { name: string; id: number }) => ({
             title: genre.name,
             endpoint: `/discover/tv?with_genres=${genre.id}`,
           }))
         );
 
-        // Fetch TV shows for each category
+        // Fetch shows with US provider filter
         const results = await Promise.all(
           categories.map(async (category) => {
-            const response = await fetch(`${BASE_URL}${category.endpoint}`, {
-              headers: { Authorization: `Bearer ${API_KEY}` },
+            const url = `${BASE_URL}${category.endpoint}`;
+            const params = {
+              watch_region: "US",
+              with_watch_providers: usProviders,
+              include_adult: "false",
+              language: "en-US",
+              page: 1,
+            };
+
+            const response = await axios.get(url, {
+              params,
+              headers: { Authorization: `Bearer ${apiKey}` },
             });
-            const data = await response.json();
-            return { title: category.title, data: data.results };
+            
+            return { title: category.title, data: response.data.results };
           })
         );
 
@@ -55,7 +104,21 @@ export default function TVShowsScreen() {
     };
 
     fetchTVData();
-  }, []);
+  }, [usProviders]);
+
+  const handleShowPress = (showId: number) => {
+    if(userId == "")
+    {
+      return;
+    }
+    router.push({
+      pathname: "/showDetails",
+      params: { 
+        showId,
+        userId1: userId
+      }
+    });
+  };
 
   if (loading) return <ActivityIndicator size="large" style={styles.loader} />;
 
@@ -73,10 +136,15 @@ export default function TVShowsScreen() {
               horizontal
               showsHorizontalScrollIndicator={false}
               renderItem={({ item: tv }) => (
-                <View style={styles.tvItem}>
-                  <Image source={{ uri: `${IMAGE_BASE_URL}${tv.poster_path}` }} style={styles.poster} />
-                  <Text numberOfLines={1} style={styles.tvTitle}>{tv.name}</Text>
-                </View>
+                <TouchableOpacity onPress={() => handleShowPress(tv.id)}>
+                  <View style={styles.tvItem}>
+                    <Image 
+                      source={{ uri: `${IMAGE_BASE_URL}${tv.poster_path}` }} 
+                      style={styles.poster} 
+                    />
+                    <Text numberOfLines={1} style={styles.tvTitle}>{tv.name}</Text>
+                  </View>
+                </TouchableOpacity>
               )}
             />
           </View>
