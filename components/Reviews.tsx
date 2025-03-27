@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native';
 import { supabase } from "../utils/supabase";
 
 interface Review {
@@ -54,7 +54,7 @@ const Reviews: React.FC<ReviewsProps> = ({ current_user, more }) => {
     if (!reviews.length) return <Text>No reviews found.</Text>;
 
     return (
-        <View>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             {reviews.map((review) => (
                 <View key={review.id} style={styles.reviewBox}>
                     <Text style={styles.reviewShowTitle}>{review.show_name}</Text>
@@ -64,7 +64,7 @@ const Reviews: React.FC<ReviewsProps> = ({ current_user, more }) => {
                     <View style={styles.reviewDivider} />
                 </View>
             ))}
-        </View>
+        </ScrollView>
     );
 };
 
