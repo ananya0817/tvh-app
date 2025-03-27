@@ -7,7 +7,10 @@ import { router } from 'expo-router';
 
 export default function TabFiveScreen() {
     const [session, setSession] = useState<Session | null>(null);
-    const [email, setEmail] = useState("")
+    const [email, setEmail] = useState("");
+    const[reviewCount, setReviewCount] = useState(0);
+    const[commentCount, setCommentCount] = useState(0);
+    const[watchCount, setWatchCount] = useState(0);
     
     useEffect(() => {
         supabase.auth.getSession().then(({ data: { session } }) => {
@@ -19,22 +22,67 @@ export default function TabFiveScreen() {
           setSession(session);
           setEmail(session?.user?.email || "");
         });
-      }, [])
+    }, [])
+    useEffect(() => {
+        if (!session?.user?.id) return;
+
+        const fetchReviewCount = async() => {
+            const { error, count } = await supabase
+                .from("Reviews")
+                .select("id", { count: "exact", head: true })
+                .eq("user", session?.user.id);
+
+            if (error) {
+                console.error("Error fetching review count:", JSON.stringify(error, null, 2));
+                return;
+            }
+            console.log("Fetched review count:", count);
+            setReviewCount(count || 0);
+        };
+        const fetchCommentCount = async() => {
+            const { error, count } = await supabase
+                .from("Comments")
+                .select("id", { count: "exact", head: true })
+                .eq("user", session?.user.id)
+                .not("comment_text", "is", null);
+
+            if (error) {
+                console.error("Error fetching comment count:", error.message);
+                return;
+            }
+            setCommentCount(count || 0);
+        };
+        const fetchWatchCount= async() => {
+            const { error, count } = await supabase
+                .from("UserShows")
+                .select("id", { count: "exact", head: true })
+                .eq("user", session?.user.id);
+
+            if (error) {
+                console.error("Error fetching watch count:", error.message);
+                return;
+            }
+            setWatchCount(count || 0);
+        };
+        fetchReviewCount();
+        fetchCommentCount();
+        fetchWatchCount();
+    }, [session]);
 
     return (
         <View style={styles.container}>
             <Text style={styles.username}>{email}</Text>
             <View style={styles.stats}>
                 <View style={styles.statBox}>
-                    <Text style={styles.statNum}>#</Text>
+                    <Text style={styles.statNum}>{commentCount}</Text>
                     <Text style={styles.statText}>comments</Text>
                 </View>
                 <View style={styles.statBox}>
-                    <Text style={styles.statNum}>#</Text>
+                    <Text style={styles.statNum}>{reviewCount}</Text>
                     <Text style={styles.statText}>reviews</Text>
                 </View>
                 <View style={styles.statBox}>
-                    <Text style={styles.statNum}>#</Text>
+                    <Text style={styles.statNum}>{watchCount}</Text>
                     <Text style={styles.statText}>shows</Text>
                 </View>
             </View>
@@ -56,7 +104,7 @@ export default function TabFiveScreen() {
                     <Text style={styles.viewMore}>View More</Text>
                 </TouchableOpacity>
             </View>
-            <Reviews current_user={session?.user?.id || ""}/>
+            <Reviews current_user={session?.user?.id || ""} more={false}/>
         </View>
     );
 }
