@@ -43,7 +43,7 @@ export default function TabFiveScreen() {
             const { error, count } = await supabase
                 .from("Comments")
                 .select("id", { count: "exact", head: true })
-                .eq("user", session?.user.id)
+                .eq("user_id", session?.user.id)
                 .not("comment_text", "is", null);
 
             if (error) {
