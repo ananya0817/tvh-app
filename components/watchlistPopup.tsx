@@ -158,11 +158,12 @@ const WatchlistPopup = ({ onStatusChange, userId, showId, showName }: Props) => 
 const styles = StyleSheet.create({
   actionButton: {
     alignItems: 'center',
-    padding: 10,
+    padding: 5,
   },
   actionText: {
     color: 'white',
     marginTop: 5,
+    fontSize: 12,
   },
   overlay: {
     flex: 1,
