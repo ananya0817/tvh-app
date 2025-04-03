@@ -1,57 +1,27 @@
 import React, { useState } from 'react';
-import {StyleSheet, View, Text, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, Alert} from 'react-native';
+import {StyleSheet, View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Alert, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
-import { supabase } from '../../utils/supabase';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Auth } from '../../components/Auth';
 
-const SignupScreen: React.FC = () => {
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
+
+export default function SignupScreen() {  
   const router = useRouter();
-  const [signupForm, setSignupForm] = useState({
-    email: '',
-    username: '',
-    password: ''
-  });
-  
-  const handleSignupChange = (key: string, value: string) => {
-    setSignupForm(prev => ({
-      ...prev,
-      [key]: value
-    }));
-  };
-  
-  const handleSignup = async () => {
-    // seeing if all fields are filled
-    if (!signupForm.email || !signupForm.password) { // removed username check for testing
-      Alert.alert('Error', 'Please fill in all fields');
-      return;
-    }
-    
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email: signupForm.email,
-        password: signupForm.password,
-      });
-  
-      if (error) {
-        Alert.alert('Signup Error', error.message);
-        return;
-      }
-  
-      console.log('Signup successful:', data);
-      Alert.alert('Success', 'Account created successfully!', [
-        { text: 'OK', onPress: () => router.push('/(login)/quiz') }
-      ]);
-    } catch (err) {
-      console.error('Signup failed:', err);
-      Alert.alert('Signup Error', 'Something went wrong. Please try again.');
-    }
-  };
-  
+  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const { signUpWithEmail, loading } = Auth()
 
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}
+      >
+      <LinearGradient
+        colors={['#9A8997', '#665565']}
+        style={styles.gradient}
       >
         <View style={styles.screen}>
           <Text style={styles.title}>Sign Up</Text>
@@ -61,10 +31,10 @@ const SignupScreen: React.FC = () => {
               <Text style={styles.label}>Email</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Value"
+                placeholder="email@address.com"
                 placeholderTextColor="#aaa"
-                value={signupForm.email}
-                onChangeText={(text) => handleSignupChange('email', text)}
+                value={email}
+                onChangeText={setEmail}
                 keyboardType="email-address"
                 autoCapitalize="none"
               />
@@ -73,10 +43,10 @@ const SignupScreen: React.FC = () => {
               <Text style={styles.label}>Username</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Value"
+                placeholder="username"
                 placeholderTextColor="#aaa"
-                value={signupForm.username}
-                onChangeText={(text) => handleSignupChange('username', text)}
+                value={username}
+                onChangeText={setUsername}
                 autoCapitalize="none"
               />
             </View>
@@ -84,16 +54,21 @@ const SignupScreen: React.FC = () => {
               <Text style={styles.label}>Password</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Value"
+                placeholder="password"
                 placeholderTextColor="#aaa"
-                value={signupForm.password}
-                onChangeText={(text) => handleSignupChange('password', text)}
+                value={password}
+                onChangeText={setPassword}
                 secureTextEntry
               />
             </View>
             <TouchableOpacity 
               style={styles.button} 
-              onPress={handleSignup}
+              onPress={() => {
+                if (!email.trim() || !username.trim() || !password.trim()) {
+                  Alert.alert('Please fill in all fields.')
+                  return
+                }
+                signUpWithEmail(email, username, password)}}
             >
               <Text style={styles.buttonText}>Sign Up</Text>
             </TouchableOpacity>
@@ -110,18 +85,22 @@ const SignupScreen: React.FC = () => {
             </Text>
           </View>
         </View>
+        </LinearGradient>
       </KeyboardAvoidingView>
-    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  gradient: {
+    flex: 1,
+  },
   screen: {
-    backgroundColor: '#8d7a8e',
     flex: 1,
     padding: 30,
     alignItems: 'center',
     justifyContent: 'center',
+    width: windowWidth,
+    height: windowHeight,
   },
   title: {
     fontSize: 40,
@@ -182,5 +161,3 @@ const styles = StyleSheet.create({
     color: 'white',
   },
 });
-
-export default SignupScreen;

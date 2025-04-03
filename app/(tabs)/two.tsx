@@ -1,10 +1,8 @@
 import { StyleSheet } from 'react-native';
-import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
 import { Session } from "@supabase/supabase-js";
 import { supabase } from "@/utils/supabase";
 import React, {useEffect, useState} from "react";
-import {useRouter} from "expo-router";
 import Reviews from '@/components/Reviews';
 
 export default function two() {
@@ -35,12 +33,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#8d7a8e',
-    alignItems: 'center',
-    justifyContent: 'center',
+    paddingTop: 60,
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
+    alignSelf: 'center',
   },
   separator: {
     marginVertical: 30,
