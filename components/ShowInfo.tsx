@@ -37,7 +37,7 @@ interface Comment {
   created_at: string;
   comment_text: string | null; // entry with null comment_text is for general episode rating/completion
   rating: number;
-  user: string;
+  user_id: string;
   season: number;
   episode: number;
   show_name: string;
@@ -85,6 +85,22 @@ const ShowInfo = () => {
   const [episodeCompletionStatus, setEpisodeCompletionStatus] = useState<{ [episode: number]: boolean }>({});
   const [completionPercentage, setCompletionPercentage] = useState<number>(0);
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  useEffect(() => {
+    const checkFavoriteStatus = async () => {
+      const { data, error } = await supabase
+        .from('UserShows')
+        .select('favorite')
+        .eq('user', userId)
+        .eq('show_id', Number(parsedShowId))
+        .single();
+  
+      if (data) setIsFavorite(data.favorite);
+    };
+    
+    if (userId) checkFavoriteStatus();
+  }, [userId, parsedShowId]);
 
   // gets episode rating (entry with null comment_text) of episode
   const getEpisodeRatingRow = async (episodeNumber: number, seasonNumber: number): Promise<RatingRow | null> => {
@@ -92,7 +108,7 @@ const ShowInfo = () => {
     const { data, error } = await supabase
       .from("Comments")
       .select("id, rating, completed")
-      .eq("user", userId)
+      .eq("user_id", userId)
       .eq("show_id", showIdNum)
       .eq("season", seasonNumber)
       .eq("episode", episodeNumber)
@@ -114,7 +130,7 @@ const fetchSeasonRating = async (seasonNumber: number) => {
     const { data, error } = await supabase
       .from("Reviews")
       .select("rating")
-      .eq("user", userId)
+      .eq("user_id", userId)
       .eq("show_id", Number(parsedShowId))
       .eq("season", seasonNumber)
       .is("review_text", null)  // only gets entry with rating (null review_text)
@@ -148,7 +164,7 @@ const submitSeasonRating = async (seasonNumber: number, rating: number) => {
     const { data: existingRating, error: fetchError } = await supabase
       .from("Reviews")
       .select("id, rating")
-      .eq("user", userId)
+      .eq("user_id", userId)
       .eq("show_id", showIdNum)
       .eq("season", seasonNumber)
       .is("review_text", null)
@@ -244,7 +260,7 @@ const submitEpisodeRating = async (episodeNumber: number, newRating: number) => 
             comment_text: null,
             rating: newRating,
             completed: false,
-            user: userId,
+            user_id: userId,
             season: selectedSeason,
             episode: episodeNumber,
             show_name: showDetails?.name || "Unknown Show",
@@ -277,7 +293,7 @@ const toggleEpisodeCompletion = async (episodeNumber: number) => {
       const { error: updateError } = await supabase
         .from("Comments")
         .update({ completed: newStatus })
-        .eq("user", userId)
+        .eq("user_id", userId)
         .eq("id", existing.id);
       if (updateError) {
         console.error(`Error toggling completion for Episode ${episodeNumber} of Season ${selectedSeason}:`, updateError);
@@ -293,7 +309,7 @@ const toggleEpisodeCompletion = async (episodeNumber: number) => {
             comment_text: null,
             rating: 0,
             completed: true,
-            user: userId,
+            user_id: userId,
             season: selectedSeason,
             episode: episodeNumber,
             show_name: showDetails?.name || "Unknown Show",
@@ -323,7 +339,7 @@ const toggleAllEpisodesCompletion = async () => {
     const { data, error } = await supabase
       .from("Comments")
       .select("completed")
-      .eq("user", userId)
+      .eq("user_id", userId)
       .eq("show_id", showIdNum)
       .is("comment_text", null);
 
@@ -335,6 +351,49 @@ const toggleAllEpisodesCompletion = async () => {
     // check if every rating row is complete
     const allCompleted = data && data.length > 0 && data.every((row) => row.completed === true);
     const newStatus = !allCompleted;
+
+    // mark show as complete in user shows table
+    try {
+      const updates = 
+      {
+        user: userId,
+        show_id: showId,
+        show_name: showDetails?.name,
+        watching: newStatus,
+        completed: newStatus,
+      };
+  
+      if(newStatus) 
+      {
+        // if marked as completed, mark watching and completed as true
+        const { error } = await supabase
+          .from('UserShows')
+          .upsert(
+            { ...updates, 
+              watching: true, 
+              completed: true,
+              to_watch: false  },
+            { onConflict: 'user,show_id' }
+          );
+  
+        if (error) throw error;
+      } 
+      else 
+      {
+        const { error } = await supabase
+          .from('UserShows')
+          .upsert(
+            { ...updates, watching: false, completed: false },
+            { onConflict: 'user,show_id' }
+          );
+  
+        if (error) throw error;
+      }  
+    } 
+    catch (error) 
+    {
+      console.error('Error updating watch status:', error);
+    }
 
     // loop through each season
     const seasons = showDetails?.seasons || [];
@@ -351,7 +410,7 @@ const toggleAllEpisodesCompletion = async () => {
           const { error: updateError } = await supabase
             .from("Comments")
             .update({ completed: newStatus, rating: updatedRating })
-            .eq("user", userId)
+            .eq("user_id", userId)
             .eq("id", existing.id);
           if (updateError) {
             console.error(
@@ -376,7 +435,7 @@ const toggleAllEpisodesCompletion = async () => {
                 comment_text: null,
                 rating: 0,
                 completed: newStatus,
-                user: userId,
+                user_id: userId,
                 season: seasonNumber,
                 episode: epNum,
                 show_name: showDetails?.name || "Unknown Show",
@@ -418,7 +477,7 @@ const toggleAllEpisodesCompletion = async () => {
         const { data, error } = await supabase
             .from("Comments")
             .select("episode, completed, season")
-            .eq("user", userId)
+            .eq("user_id", userId)
             .eq("show_id", showIdNum)
             .is("comment_text", null);
 
@@ -459,7 +518,7 @@ const toggleAllEpisodesCompletion = async () => {
       const { data, error } = await supabase
         .from("Reviews")
         .select("*")
-        .eq("user", userId)
+        .eq("user_id", userId)
         .eq("show_id", Number(parsedShowId))
         .neq("review_text", null)
         .order("created_at", { ascending: false });
@@ -500,7 +559,7 @@ const toggleAllEpisodesCompletion = async () => {
       const { data, error } = await supabase
         .from("Comments")
         .select("*")
-        .eq("user", userId)
+        .eq("user_id", userId)
         .eq("show_id", Number(parsedShowId))
         .eq("season", selectedSeason)
         .neq("comment_text", null)
@@ -522,7 +581,7 @@ const toggleAllEpisodesCompletion = async () => {
         episode: selectedEpisode,
         comment_text: commentText,
         rating: 0,
-        user: userId,
+        user_id: userId,
         show_name: showDetails?.name || "Unknown Show",
         show_id: Number(parsedShowId),
         completed: false,
@@ -750,6 +809,35 @@ const toggleAllEpisodesCompletion = async () => {
 
             {/* action buttons */}
             <View style={styles.actionContainer}>
+              <TouchableOpacity 
+                style={styles.actionButton}
+                onPress={async () => {
+                  try {
+                    const { error } = await supabase
+                      .from('UserShows')
+                      .upsert({
+                        user: userId,
+                        show_id: Number(parsedShowId),
+                        show_name: showDetails?.name,
+                        favorite: !isFavorite,
+                      }, {
+                        onConflict: 'user,show_id'
+                      });
+
+                    if (error) throw error;
+                    setIsFavorite(!isFavorite);
+                  } catch (error) {
+                    console.error('Error updating favorite:', error);
+                  }
+                }}
+              >
+                <FontAwesome 
+                  name={isFavorite ? "star" : "star-o"} 
+                  size={30} 
+                  color={isFavorite ? "gold" : "white"} 
+                />
+                <Text style={styles.actionText}>Favorite</Text>
+              </TouchableOpacity>
               <WatchlistPopup 
                 userId={userId}
                 showId={Number(parsedShowId)}

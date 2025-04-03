@@ -96,17 +96,6 @@ const fetchShowDetails = async (showId: number): Promise<Show | null> => {
     fetchUserShows();
   }, [selected]);
 
-  const renderItem = ({ item }: { item: Show }) => (
-    <View style={styles.showContainer}>
-      {item.poster_path && (
-        <Image 
-          source={{ uri: `https://image.tmdb.org/t/p/w200/${item.poster_path}` }} 
-          style={styles.poster} 
-        />
-      )}
-    </View>
-  );
-
   return (
     <View style={styles.container}>
       {/* Toggle Buttons */}
