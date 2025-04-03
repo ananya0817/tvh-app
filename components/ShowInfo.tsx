@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Modal,
   TextInput,
+  Platform,
 } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { FontAwesome } from "@expo/vector-icons";
@@ -18,6 +19,7 @@ import { useShowInfo } from "./useShowInfo";
 import { supabase } from "@/utils/supabase";
 import { BlurView } from "expo-blur"
 import WatchlistPopup from "./watchlistPopup";
+import { KeyboardAvoidingView } from "react-native";
 
 // review object
 interface Review {
@@ -92,7 +94,7 @@ const ShowInfo = () => {
       const { data, error } = await supabase
         .from('UserShows')
         .select('favorite')
-        .eq('user', userId)
+        .eq('user_id', userId)
         .eq('show_id', Number(parsedShowId))
         .single();
   
@@ -686,6 +688,9 @@ const toggleAllEpisodesCompletion = async () => {
             {/* review modal */}
             <Modal animationType="slide" transparent visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
               <View style={reviewModalStyles.modalOverlay}>
+              <KeyboardAvoidingView
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
+              >
                 <View style={reviewModalStyles.modalContainer}>
                   <View style={reviewModalStyles.modalHeader}>
                     <Text style={reviewModalStyles.modalTitle}>Reviews</Text>
@@ -742,12 +747,16 @@ const toggleAllEpisodesCompletion = async () => {
                     </TouchableOpacity>
                   </View>
                 </View>
+                </KeyboardAvoidingView>
               </View>
             </Modal>
 
             {/* comments modal */}
             <Modal animationType="slide" transparent visible={commentsModalVisible} onRequestClose={() => setCommentsModalVisible(false)}>
               <View style={reviewModalStyles.modalOverlay}>
+                <KeyboardAvoidingView
+                  behavior={Platform.OS === "ios" ? "padding" : "height"}
+                >
                 <View style={reviewModalStyles.modalContainer}>
                   <View style={reviewModalStyles.modalHeader}>
                     <Text style={reviewModalStyles.modalTitle}>Episode Comments</Text>
@@ -804,6 +813,7 @@ const toggleAllEpisodesCompletion = async () => {
                     </TouchableOpacity>
                   </View>
                 </View>
+                </KeyboardAvoidingView>
               </View>
             </Modal>
 
@@ -816,12 +826,12 @@ const toggleAllEpisodesCompletion = async () => {
                     const { error } = await supabase
                       .from('UserShows')
                       .upsert({
-                        user: userId,
+                        user_id: userId,
                         show_id: Number(parsedShowId),
                         show_name: showDetails?.name,
                         favorite: !isFavorite,
                       }, {
-                        onConflict: 'user,show_id'
+                        onConflict: 'user_id,show_id'
                       });
 
                     if (error) throw error;
