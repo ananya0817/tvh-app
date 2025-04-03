@@ -25,7 +25,7 @@ import { KeyboardAvoidingView } from "react-native";
 interface Review {
   id: number;
   created_at: string;
-  user: string;
+  user_id: string;
   show_name: string;
   show_id: string;
   season: number | null;
@@ -197,7 +197,7 @@ const submitSeasonRating = async (seasonNumber: number, rating: number) => {
             created_at: new Date().toISOString(),
             review_text: null, // null comment_text means it is the season rating row
             rating,
-            user: userId,
+            user_id: userId,
             season: seasonNumber,
             show_name: showDetails?.name || "Unknown Show",
             show_id: showIdNum,
@@ -358,7 +358,7 @@ const toggleAllEpisodesCompletion = async () => {
     try {
       const updates = 
       {
-        user: userId,
+        user_id: userId,
         show_id: showId,
         show_name: showDetails?.name,
         watching: newStatus,
@@ -375,7 +375,7 @@ const toggleAllEpisodesCompletion = async () => {
               watching: true, 
               completed: true,
               to_watch: false  },
-            { onConflict: 'user,show_id' }
+            { onConflict: 'user_id,show_id' }
           );
   
         if (error) throw error;
@@ -386,7 +386,7 @@ const toggleAllEpisodesCompletion = async () => {
           .from('UserShows')
           .upsert(
             { ...updates, watching: false, completed: false },
-            { onConflict: 'user,show_id' }
+            { onConflict: 'user_id,show_id' }
           );
   
         if (error) throw error;
@@ -537,7 +537,7 @@ const toggleAllEpisodesCompletion = async () => {
     const newReview: Review = {
       id: Date.now(),
       created_at: new Date().toISOString(),
-      user: userId,
+      user_id: userId,
       show_name: showDetails?.name || "Unknown Show",
       show_id: parsedShowId,
       season: reviewType === "show" ? null : selectedSeason,
