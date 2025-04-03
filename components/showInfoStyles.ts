@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
   container: {
@@ -25,9 +25,11 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     width: "100%",
     padding: 15,
+    marginTop: Platform.OS === 'ios' ? 25 : 10,
   },
 
   poster: {
+    // marginTop: Platform.OS === 'ios' ? 30: 10,
     width: 140,
     height: 210,
     marginRight: 15,
@@ -100,7 +102,8 @@ const styles = StyleSheet.create({
   /* action buttons */
   actionContainer: {
     flexDirection: "row",
-    justifyContent: "space-around",
+    justifyContent: Platform.OS === "ios" ? "space-evenly" : "space-between",
+    alignItems: "center",
     backgroundColor: "#998498",
     paddingVertical: 10,
     width: 415,

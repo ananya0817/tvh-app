@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
   container: {
@@ -50,9 +50,10 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     backgroundColor: "#AF9FAE",
     marginBottom: 10,
-    marginVertical: 5,
+    marginVertical: Platform.OS === "ios" ? 25 : 5,
     alignSelf: "center",
     textAlign: "center",
+    //alignItems: "center",
     fontWeight: "bold",
     fontSize: 16,
     flexDirection: "row",
@@ -125,7 +126,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     zIndex: 100,
     left: 50,
-    top: 27,
+    top: Platform.OS === "ios" ? 40: 27,
   },
 });
 

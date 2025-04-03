@@ -1,4 +1,4 @@
-import { StyleSheet, FlatList, Image, TouchableOpacity } from 'react-native';
+import { StyleSheet, FlatList, Image, TouchableOpacity, Platform } from 'react-native';
 import React, { useState, useEffect } from "react";
 import { Text, View } from '@/components/Themed';
 import { Button } from '@rneui/base';
@@ -177,6 +177,7 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   buttonContainer: {
+    marginTop: Platform.OS === 'ios' ? 25 : 0,
     flexDirection: "row",
     justifyContent: "space-between",
     paddingHorizontal: 20,
