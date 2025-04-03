@@ -142,7 +142,6 @@ export default function TVShowsScreen() {
                       source={{ uri: `${IMAGE_BASE_URL}${tv.poster_path}` }} 
                       style={styles.poster} 
                     />
-                    <Text numberOfLines={1} style={styles.tvTitle}>{tv.name}</Text>
                   </View>
                 </TouchableOpacity>
               )}
