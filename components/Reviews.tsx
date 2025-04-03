@@ -21,6 +21,7 @@ const Reviews: React.FC<ReviewsProps> = ({ current_user, more }) => {
     const [reviews, setReviews] = useState<Review[]>([]);
     const [loading, setLoading] = useState(true);
 
+
     const fetchReviews = useCallback(async () => {
         if (!current_user) return;
         try {

@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import {StyleSheet, Text, View, TouchableOpacity, FlatList, Image} from 'react-native';
 import React, { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../utils/supabase'
 import { Session } from '@supabase/supabase-js'
@@ -6,6 +6,16 @@ import Reviews from '@/components/Reviews';
 import { router } from 'expo-router';
 import { Auth } from '../../components/Auth';
 import { useFocusEffect } from '@react-navigation/native';
+import {apiKey} from "@/components/api_links";
+import axios from "axios";
+
+interface Show {
+    id: number;
+    name: string;
+    poster_path: string | null;
+}
+
+const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
 
 export default function TabFiveScreen() {
     const [session, setSession] = useState<Session | null>(null);
@@ -15,6 +25,9 @@ export default function TabFiveScreen() {
     const[reviewCount, setReviewCount] = useState(0);
     const[commentCount, setCommentCount] = useState(0);
     const[watchCount, setWatchCount] = useState(0);
+    const [shows, setShows] = useState<Show[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [favorite, setFavorite] = useState(0);
     
     useEffect(() => {
         supabase.auth.getSession().then(({ data: { session } }) => {
@@ -46,7 +59,31 @@ export default function TabFiveScreen() {
             setUsername(data.username);
         }
     }, [session]);
-    
+    const fetchUserShows = useCallback(async () => {
+            try {
+                setLoading(true);
+
+                const {data, error} = await supabase
+                    .from('UserShows')
+                    .select('show_id')
+                    .eq('user_id', session.user.id)
+                    .eq("favorite", true);
+
+                if (error) throw error;
+
+                const showIds = data?.map(item => item.show_id) || [];
+                const showsData = await Promise.all(showIds.map(fetchShowDetails));
+
+                // console.log("Fetched Shows:", showsData);
+                setShows(showsData.filter((show): show is Show => show !== null && show.poster_path !== null));
+
+
+            } catch (error) {
+                console.error('Error fetching shows:', error);
+            } finally {
+                setLoading(false);
+            }
+        }, [favorite]);
     const fetchReviewCount = useCallback(async() => {
         const { error, count } = await supabase
             .from("Reviews")
@@ -74,6 +111,7 @@ export default function TabFiveScreen() {
         }
         setCommentCount(count || 0);
     }, [session]);
+  
     const fetchWatchCount= useCallback(async() => {
         const { error, count } = await supabase
             .from("UserShows")
@@ -86,16 +124,60 @@ export default function TabFiveScreen() {
         }
         setWatchCount(count || 0);
     }, [session]);
+    }, [])
+
+   
+
+    const fetchShowDetails = async (showId: number): Promise<Show | null> => {
+        try {
+            const options = {
+                method: 'GET',
+                url: `https://api.themoviedb.org/3/tv/${showId}`,
+                params: { language: 'en-US' },
+                headers: {
+                    accept: 'application/json',
+                    Authorization: `Bearer ${apiKey}`
+                }
+            };
+
+            const response = await axios.request(options);
+            const data = response.data;
+
+            return {
+                id: showId,
+                name: data.name || 'Unknown Show',
+                poster_path: data.poster_path
+            };
+        } catch (error) {
+            console.error('Error fetching show details:', error);
+            return null;
+        }
+    };
+
+    const handleShowPress = (showId: number) => {
+        if(session?.user.id == "")
+        {
+            return;
+        }
+        router.push({
+            pathname: "/showDetails",
+            params: {
+                showId,
+                userId1: session?.user.id
+            }
+        });
+    };
 
     useFocusEffect(
         useCallback(() => {
             if (session?.user?.id) {
                 fetchUsername(session.user.id);
+                fetchUserShows();
                 fetchReviewCount();
                 fetchCommentCount();
                 fetchWatchCount();
             }
-        }, [session, fetchReviewCount, fetchCommentCount, fetchWatchCount])
+        }, [session, fetchUserShows, fetchReviewCount, fetchCommentCount, fetchWatchCount])
     );
 
     return (
@@ -125,7 +207,25 @@ export default function TabFiveScreen() {
 
             <Text style={styles.header}> Top Shows</Text>
             <View style={styles.showsBox}>
-
+                <FlatList
+                    contentContainerStyle={{paddingBottom:100}}
+                    style={{maxHeight:180}}
+                    data={shows}
+                    keyExtractor={(tv) => tv.id.toString()}
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    renderItem={({ item: tv }) => (
+                        <TouchableOpacity onPress={() => handleShowPress(tv.id)}>
+                            <View style={styles.tvItem}>
+                                <Image
+                                    source={{ uri: `${IMAGE_BASE_URL}${tv.poster_path}` }}
+                                    style={styles.poster}
+                                />
+                                <Text numberOfLines={1} style={styles.tvTitle}>{tv.name}</Text>
+                            </View>
+                        </TouchableOpacity>
+                    )}
+                />
             </View>
 
             <View style={styles.divider} />
@@ -138,7 +238,7 @@ export default function TabFiveScreen() {
                     <Text style={styles.viewMore}>View More</Text>
                 </TouchableOpacity>
             </View>
-            <Reviews current_user={session?.user?.id || ""} more={false}/>
+            <Reviews current_user={session?.user?.id || ""} more={false} />
         </View>
     );
 }
@@ -204,14 +304,32 @@ const styles = StyleSheet.create({
         marginBottom: 15,
     },
     header: {
-        fontSize: 18,
+        fontSize: 20,
         fontWeight: 'bold',
         color: 'white',
+        // marginBottom: 5,
     },
     showsBox: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 125,
+        marginBottom: 15,
+        marginTop:10,
+        paddingHorizontal: 5,
+    },
+    tvItem: {
+        width: 110,
+        marginRight: 5,
+        alignItems: "center",
+    },
+    poster: {
+        width: 110,
+        height: 160,
+        borderRadius: 10,
+    },
+    tvTitle: {
+        fontSize: 14,
+        fontWeight: "600",
+        marginTop: 5,
+        textAlign: "center",
+        color: "#ffffff",
     },
     reviews: {
         flexDirection: 'row',
