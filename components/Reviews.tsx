@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useCallback, useState } from "react";
+import { StyleSheet, Text, View, ScrollView } from 'react-native';
 import { supabase } from "../utils/supabase";
+import { useFocusEffect } from "expo-router";
 
 interface Review {
     id: number;
@@ -19,35 +20,37 @@ interface ReviewsProps {
 const Reviews: React.FC<ReviewsProps> = ({ current_user, more }) => {
     const [reviews, setReviews] = useState<Review[]>([]);
     const [loading, setLoading] = useState(true);
-    useEffect(() => {
-        const fetchReviews = async () => {
-            if (!current_user) return;
-            try {
-                let query = supabase
-                    .from("Reviews")
-                    .select('id, season, review_text, rating, user_id, show_name, created_at, show_id')
-                    .eq("user_id", current_user)
-                    .order("created_at", {ascending: false})
 
-                if (!more){
-                    query = query.limit(3);
-                }
 
-                const { data, error } = await query;
+    const fetchReviews = useCallback(async () => {
+        if (!current_user) return;
+        try {
+            let query = supabase
+                .from("Reviews")
+                .select('id, season, review_text, rating, user_id, show_name, created_at, show_id')
+                .eq("user_id", current_user)
+                .order("created_at", {ascending: false})
 
-                if (error) throw error;
-                setReviews([... data]);
-            }catch (error){
-                console.error("Error fetching reviews:", error);
-            } finally {
-                setLoading(false);
+            if (!more){
+                query = query.limit(3);
             }
 
+            const { data, error } = await query;
 
-        };
-        fetchReviews();
-
+            if (error) throw error;
+            setReviews([... data]);
+        }catch (error){
+            console.error("Error fetching reviews:", error);
+        } finally {
+            setLoading(false);
+        } 
     }, [current_user, more]);
+
+    useFocusEffect(
+        useCallback(() => {
+            fetchReviews();
+        }, [fetchReviews])
+    )
 
     if (loading) return <Text>Loading...</Text>;
     if (!reviews.length) return <Text>No reviews found.</Text>;
@@ -69,7 +72,7 @@ const Reviews: React.FC<ReviewsProps> = ({ current_user, more }) => {
 
 const styles = StyleSheet.create({
     reviewBox: {
-        padding: 5,
+        padding: 15,
     },
     reviewShowTitle:{
         fontSize: 15,
@@ -82,9 +85,7 @@ const styles = StyleSheet.create({
     },
     reviewDivider: {
         backgroundColor: 'white',
-        alignSelf: 'center',
         height: 1,
-        width: '95%',
         marginTop: 5,
         marginBottom: 5,
     },

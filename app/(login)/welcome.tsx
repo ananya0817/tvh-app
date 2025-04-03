@@ -1,6 +1,7 @@
 import React from 'react';
 import {StyleSheet, View, Text, TouchableOpacity, Image} from 'react-native';
 import { useRouter } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
 
 // logo
 const TVLogo = require('../../assets/images/logo-Photoroom.png'); 
@@ -16,6 +17,10 @@ const router = useRouter();
   };
 
   return (
+    <LinearGradient
+      colors={['#9A8997', '#665565']}
+      style={styles.gradient}
+    >
     <View style={styles.screen}>
       <View style={styles.logoContainer}>
         <Image source={TVLogo} style={styles.logo} resizeMode="contain" />
@@ -34,12 +39,15 @@ const router = useRouter();
         <Text style={styles.buttonText}>Sign In</Text>
       </TouchableOpacity>
     </View>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
+  gradient: {
+    flex: 1,
+  },
   screen: {
-    backgroundColor: '#8d7a8e',
     flex: 1,
     padding: 30,
     alignItems: 'center',
@@ -64,7 +72,7 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 5,
+    borderRadius: 15,
     paddingVertical: 30,
     alignItems: 'center',
     marginVertical: 10,
@@ -78,7 +86,7 @@ const styles = StyleSheet.create({
   },
   secondaryButton: {
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 5,
+    borderRadius: 15,
     paddingVertical: 30,
     alignItems: 'center',
     marginVertical: 10,
