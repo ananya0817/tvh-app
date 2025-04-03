@@ -47,7 +47,7 @@ export default function TabFiveScreen() {
                 const {data, error} = await supabase
                     .from('UserShows')
                     .select('show_id')
-                    .eq('user', session.user.id)
+                    .eq('user_id', session.user.id)
                     .eq("favorite", true);
 
                 if (error) throw error;
@@ -69,7 +69,7 @@ export default function TabFiveScreen() {
             const { error, count } = await supabase
                 .from("Reviews")
                 .select("id", { count: "exact", head: true })
-                .eq("user", session?.user.id);
+                .eq("user_id", session?.user.id);
 
             if (error) {
                 console.error("Error fetching review count:", JSON.stringify(error, null, 2));
@@ -94,7 +94,7 @@ export default function TabFiveScreen() {
             const { error, count } = await supabase
                 .from("UserShows")
                 .select("id", { count: "exact", head: true })
-                .eq("user", session?.user.id)
+                .eq("user_id", session?.user.id)
                 .eq("completed", true);
 
             if (error) {

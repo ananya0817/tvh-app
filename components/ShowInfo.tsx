@@ -130,7 +130,7 @@ const fetchSeasonRating = async (seasonNumber: number) => {
     const { data, error } = await supabase
       .from("Reviews")
       .select("rating")
-      .eq("user", userId)
+      .eq("user_id", userId)
       .eq("show_id", Number(parsedShowId))
       .eq("season", seasonNumber)
       .is("review_text", null)  // only gets entry with rating (null review_text)
@@ -164,7 +164,7 @@ const submitSeasonRating = async (seasonNumber: number, rating: number) => {
     const { data: existingRating, error: fetchError } = await supabase
       .from("Reviews")
       .select("id, rating")
-      .eq("user", userId)
+      .eq("user_id", userId)
       .eq("show_id", showIdNum)
       .eq("season", seasonNumber)
       .is("review_text", null)
@@ -518,7 +518,7 @@ const toggleAllEpisodesCompletion = async () => {
       const { data, error } = await supabase
         .from("Reviews")
         .select("*")
-        .eq("user", userId)
+        .eq("user_id", userId)
         .eq("show_id", Number(parsedShowId))
         .neq("review_text", null)
         .order("created_at", { ascending: false });

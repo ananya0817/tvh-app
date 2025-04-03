@@ -5,7 +5,7 @@ import { supabase } from "../utils/supabase";
 interface Review {
     id: number;
     created_at: string;
-    user: string;
+    user_id: string;
     show_name: string;
     show_id: string;
     season: number | null;
@@ -25,8 +25,8 @@ const Reviews: React.FC<ReviewsProps> = ({ current_user, more }) => {
             try {
                 let query = supabase
                     .from("Reviews")
-                    .select('id, season, review_text, rating, user, show_name, created_at, show_id')
-                    .eq("user", current_user)
+                    .select('id, season, review_text, rating, user_id, show_name, created_at, show_id')
+                    .eq("user_id", current_user)
                     .order("created_at", {ascending: false})
 
                 if (!more){
