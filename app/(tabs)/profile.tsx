@@ -26,7 +26,6 @@ export default function TabFiveScreen() {
     const[commentCount, setCommentCount] = useState(0);
     const[watchCount, setWatchCount] = useState(0);
     const [shows, setShows] = useState<Show[]>([]);
-    const [loading, setLoading] = useState(true);
     const [favorite, setFavorite] = useState(0);
     
     useEffect(() => {
@@ -60,6 +59,7 @@ export default function TabFiveScreen() {
         }
     }, [session]);
     const fetchUserShows = useCallback(async () => {
+        if (!session?.user?.id) return;
             try {
                 setLoading(true);
 
@@ -85,24 +85,25 @@ export default function TabFiveScreen() {
             }
         }, [favorite]);
     const fetchReviewCount = useCallback(async() => {
+        if (!session?.user?.id) return;
         const { error, count } = await supabase
             .from("Reviews")
             .select("id", { count: "exact", head: true })
-            .eq("user_id", session?.user.id);
+            .eq("user_id", session.user.id);
 
         if (error) {
             console.error("Error fetching review count:", JSON.stringify(error, null, 2));
             return;
         }
-        console.log("Fetched review count:", count);
         setReviewCount(count || 0);
     }, [session]);
 
     const fetchCommentCount = useCallback(async() => {
+        if (!session?.user?.id) return;
         const { error, count } = await supabase
             .from("Comments")
             .select("id", { count: "exact", head: true })
-            .eq("user_id", session?.user.id)
+            .eq("user_id", session.user.id)
             .not("comment_text", "is", null);
 
         if (error) {
@@ -113,10 +114,11 @@ export default function TabFiveScreen() {
     }, [session]);
   
     const fetchWatchCount= useCallback(async() => {
+        if (!session?.user?.id) return;
         const { error, count } = await supabase
             .from("UserShows")
             .select("id", { count: "exact", head: true })
-            .eq("user_id", session?.user.id);
+            .eq("user_id", session.user.id);
 
         if (error) {
             console.error("Error fetching watch count:", error.message);
@@ -124,7 +126,6 @@ export default function TabFiveScreen() {
         }
         setWatchCount(count || 0);
     }, [session]);
-    }, [])
 
    
 
@@ -182,7 +183,7 @@ export default function TabFiveScreen() {
 
     return (
         <View style={styles.container}>
-            <View style={styles.top}>
+            <View>
                 <Text style={styles.username}>{username}</Text>
                 <TouchableOpacity onPress={signOut} style={styles.signOutButton}>
                     <Text style={styles.signOutText}>Sign Out</Text>
@@ -249,14 +250,14 @@ const styles = StyleSheet.create({
         padding: 15,
         paddingTop: 50,
     },
-    top: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        width: '100%',
-        paddingHorizontal: 20,
-        marginTop: 10,
-    },
+    // top: {
+    //     flexDirection: 'row',
+    //     justifyContent: 'space-between',
+    //     alignItems: 'center',
+    //     width: '100%',
+    //     paddingHorizontal: 20,
+    //     marginTop: 10,
+    // },
     username: {
         marginTop: 10,
         marginLeft: 20,
