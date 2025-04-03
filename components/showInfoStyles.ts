@@ -25,15 +25,16 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     width: "100%",
     padding: 15,
-    marginTop: Platform.OS === 'ios' ? 25 : 10,
+    marginTop: Platform.OS === 'ios' ? 35 : 10,
   },
 
   poster: {
-    // marginTop: Platform.OS === 'ios' ? 30: 10,
+    //marginTop: Platform.OS === 'ios' ? 30: 10,
     width: 140,
     height: 210,
     marginRight: 15,
     elevation: 10,
+    borderRadius: 10,
   },
 
   detailsContainer: {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, Image, ActivityIndicator, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, FlatList, Image, ActivityIndicator, StyleSheet, TouchableOpacity, Platform } from "react-native";
 import { useRouter } from 'expo-router';
 import axios from 'axios';
 import { apiKey } from "@/components/api_links";
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#625161",
-    paddingVertical: 5,
+    paddingVertical: Platform.OS === "ios" ? 45: 10,
   },
   loader: {
     flex: 1,
@@ -175,6 +175,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 5,
     color: "#ffffff",
+    // marginTop: Platform.OS === "ios" ? 15 : 0,
   },
   tvItem: {
     width: 110,

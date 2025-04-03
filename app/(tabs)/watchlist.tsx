@@ -163,10 +163,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#625161",
-    paddingTop: 20,
+    paddingTop: 20,  
   },
   buttonContainer: {
-    marginTop: Platform.OS === 'ios' ? 25 : 0,
+    marginTop: Platform.OS === 'ios' ? 40 : 0,
     flexDirection: "row",
     justifyContent: "space-between",
     paddingHorizontal: 20,

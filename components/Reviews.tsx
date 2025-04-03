@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Platform } from 'react-native';
 import { supabase } from "../utils/supabase";
+import { padding } from "aes-js";
 
 interface Review {
     id: number;
@@ -53,7 +54,7 @@ const Reviews: React.FC<ReviewsProps> = ({ current_user, more }) => {
     if (!reviews.length) return <Text>No reviews found.</Text>;
 
     return (
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <ScrollView style={styles.reviewContainer} contentContainerStyle={{ flexGrow: 1 }}>
             {reviews.map((review) => (
                 <View key={review.id} style={styles.reviewBox}>
                     <Text style={styles.reviewShowTitle}>{review.show_name}</Text>
@@ -68,6 +69,9 @@ const Reviews: React.FC<ReviewsProps> = ({ current_user, more }) => {
 };
 
 const styles = StyleSheet.create({
+    reviewContainer: {
+        paddingTop: Platform.OS === "ios" ? 25 : 0,
+    },
     reviewBox: {
         padding: 5,
     },

@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import { View } from '@/components/Themed';
 import Shows from '@/components/Shows';
 
@@ -15,6 +15,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingTop: Platform.OS === "ios" ? 10 : 0,
   },
   title: {
     fontSize: 20,

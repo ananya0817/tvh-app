@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity, Platform } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Platform, FlatList, Image } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../utils/supabase'
 import { Session } from '@supabase/supabase-js'
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
         padding: 15,
     },
     username: {
-        marginTop: Platform.OS === 'ios' ? 15 : 10,
+        marginTop: Platform.OS === 'ios' ? 25 : 10,
         marginLeft: 20,
         fontSize: 35,
         fontWeight: 'bold',
