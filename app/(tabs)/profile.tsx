@@ -118,7 +118,8 @@ export default function TabFiveScreen() {
         const { error, count } = await supabase
             .from("UserShows")
             .select("id", { count: "exact", head: true })
-            .eq("user_id", session.user.id);
+            .eq("user_id", session.user.id)
+            .eq("completed", true);
 
         if (error) {
             console.error("Error fetching watch count:", error.message);
@@ -209,7 +210,7 @@ export default function TabFiveScreen() {
             <Text style={styles.header}> Top Shows</Text>
             <View style={styles.showsBox}>
                 <FlatList
-                    contentContainerStyle={{paddingBottom:100}}
+                    //contentContainerStyle={{paddingBottom:100}}
                     style={{maxHeight:180}}
                     data={shows}
                     keyExtractor={(tv) => tv.id.toString()}
@@ -222,7 +223,6 @@ export default function TabFiveScreen() {
                                     source={{ uri: `${IMAGE_BASE_URL}${tv.poster_path}` }}
                                     style={styles.poster}
                                 />
-                                <Text numberOfLines={1} style={styles.tvTitle}>{tv.name}</Text>
                             </View>
                         </TouchableOpacity>
                     )}
@@ -311,7 +311,6 @@ const styles = StyleSheet.create({
         // marginBottom: 5,
     },
     showsBox: {
-        marginBottom: 15,
         marginTop:10,
         paddingHorizontal: 5,
     },
