@@ -41,7 +41,7 @@ const WatchlistPopup = ({ onStatusChange, userId, showId, showName }: Props) => 
       setLoading(true);
       
       const updates = {
-        user: userId, // Changed from user_id to match DB column name
+        user_id: userId, // Changed from user_id to match DB column name
         show_id: showId,
         show_name: showName,
         to_watch: type === 'to-watch' ? !toWatch : false,
@@ -52,7 +52,7 @@ const WatchlistPopup = ({ onStatusChange, userId, showId, showName }: Props) => 
       const { error } = await supabase
         .from('UserShows')
         .upsert(updates, {
-          onConflict: 'user,show_id', // Match your unique constraint columns
+          onConflict: 'user_id,show_id', // Match your unique constraint columns
         });
   
       if (error) throw error;
@@ -80,7 +80,7 @@ const WatchlistPopup = ({ onStatusChange, userId, showId, showName }: Props) => 
         const { data, error } = await supabase
           .from('UserShows')
           .select('to_watch, watching')
-          .eq('user', userId)
+          .eq('user_id', userId)
           .eq('show_id', showId)
           .single();
 

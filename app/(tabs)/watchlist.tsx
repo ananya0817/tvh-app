@@ -72,7 +72,7 @@ const fetchShowDetails = async (showId: number): Promise<Show | null> => {
       const { data, error } = await supabase
         .from('UserShows')
         .select('show_id')
-        .eq('user', session?.user?.id || "")
+        .eq('user_id', session?.user?.id || "")
         .eq(selected === 'toWatch' ? 'to_watch' : 'watching', true);
 
       if (error) throw error;
