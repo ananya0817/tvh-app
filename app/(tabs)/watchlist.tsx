@@ -61,18 +61,14 @@ const fetchShowDetails = async (showId: number): Promise<Show | null> => {
   }
 };
 
-  const fetchUserShows = async () => {
-    if(userId == "")
-    {
-      return;
-    }
+const fetchUserShows = async () => {
+    if(userId == "") {return;}
+    setLoading(true);
     try {
-      setLoading(true);
-
       const { data, error } = await supabase
         .from('UserShows')
         .select('show_id')
-        .eq('user_id', session?.user?.id || "")
+        .eq('user_id', userId)
         .eq(selected === 'toWatch' ? 'to_watch' : 'watching', true);
 
       if (error) throw error;
@@ -93,8 +89,10 @@ const fetchShowDetails = async (showId: number): Promise<Show | null> => {
   };
 
   useEffect(() => {
-    fetchUserShows();
-  }, [selected]);
+    if (userId!==""){
+      fetchUserShows();
+    }
+  }, [selected,userId]);
 
   return (
     <View style={styles.container}>

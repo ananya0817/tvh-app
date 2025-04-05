@@ -60,30 +60,29 @@ export default function TabFiveScreen() {
     }, [session]);
     const fetchUserShows = useCallback(async () => {
         if (!session?.user?.id) return;
-            try {
-                setLoading(true);
+        setLoading(true);
+        try {
+            const {data, error} = await supabase
+                .from('UserShows')
+                .select('show_id')
+                .eq('user_id', session.user.id)
+                .eq("favorite", true);
 
-                const {data, error} = await supabase
-                    .from('UserShows')
-                    .select('show_id')
-                    .eq('user_id', session.user.id)
-                    .eq("favorite", true);
+            if (error) throw error;
 
-                if (error) throw error;
+            const showIds = data?.map(item => item.show_id) || [];
+            const showsData = await Promise.all(showIds.map(fetchShowDetails));
+            const filtered = showsData.filter(
+                (show): show is Show => show !== null && show.poster_path !== null
+            );
+            setShows(filtered);
 
-                const showIds = data?.map(item => item.show_id) || [];
-                const showsData = await Promise.all(showIds.map(fetchShowDetails));
-
-                // console.log("Fetched Shows:", showsData);
-                setShows(showsData.filter((show): show is Show => show !== null && show.poster_path !== null));
-
-
-            } catch (error) {
-                console.error('Error fetching shows:', error);
-            } finally {
-                setLoading(false);
-            }
-        }, [favorite]);
+        } catch (error) {
+            console.error('Error fetching shows:', error);
+        } finally {
+            setLoading(false);
+        }
+    }, [session]);
     const fetchReviewCount = useCallback(async() => {
         if (!session?.user?.id) return;
         const { error, count } = await supabase
@@ -208,25 +207,32 @@ export default function TabFiveScreen() {
             <View style={styles.divider} />
 
             <Text style={styles.header}> Top Shows</Text>
-            <View style={styles.showsBox}>
-                <FlatList
-                    //contentContainerStyle={{paddingBottom:100}}
-                    style={{maxHeight:180}}
-                    data={shows}
-                    keyExtractor={(tv) => tv.id.toString()}
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    renderItem={({ item: tv }) => (
-                        <TouchableOpacity onPress={() => handleShowPress(tv.id)}>
-                            <View style={styles.tvItem}>
-                                <Image
-                                    source={{ uri: `${IMAGE_BASE_URL}${tv.poster_path}` }}
-                                    style={styles.poster}
-                                />
-                            </View>
-                        </TouchableOpacity>
-                    )}
-                />
+            <View style={styles.showsBox }>
+                {loading ? (<Text>Loading...</Text>
+                ) : shows.length === 0 ? (
+                    <Text>Star your favorite shows to showcase them! </Text>
+                ) : (
+                    <FlatList
+                        contentContainerStyle={{paddingBottom:180}}
+                        style={{maxHeight:180}}
+                        data={shows}
+                        keyExtractor={(tv) => tv.id.toString()}
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        renderItem={({ item: tv }) => (
+                            <TouchableOpacity onPress={() => handleShowPress(tv.id)}>
+                                <View style={styles.tvItem}>
+                                    <Image
+                                        source={{ uri: `${IMAGE_BASE_URL}${tv.poster_path}` }}
+                                        style={styles.poster}
+                                    />
+                                </View>
+                            </TouchableOpacity>
+                        )}
+                    />
+                )}
+
+
             </View>
 
             <View style={styles.divider} />
