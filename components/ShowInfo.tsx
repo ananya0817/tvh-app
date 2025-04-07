@@ -20,6 +20,7 @@ import { supabase } from "@/utils/supabase";
 import { BlurView } from "expo-blur"
 import WatchlistPopup from "./watchlistPopup";
 import { KeyboardAvoidingView } from "react-native";
+import ResetAlertModal from "./resetAlertModal";
 
 // review object
 interface Review {
@@ -88,6 +89,7 @@ const ShowInfo = () => {
   const [completionPercentage, setCompletionPercentage] = useState<number>(0);
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [showResetModal, setShowResetModal] = useState(false);
 
   useEffect(() => {
     const checkFavoriteStatus = async () => {
@@ -859,12 +861,18 @@ const toggleAllEpisodesCompletion = async () => {
                 <FontAwesome name="pencil" size={30} color="white" />
                 <Text style={styles.actionText}>Write Review</Text>
               </TouchableOpacity>
+              <>
               <TouchableOpacity
                 style={styles.actionButton}
                 onPress={async () => {
-                  setIsUpdating(true);
-                  await toggleAllEpisodesCompletion();
-                  setIsUpdating(false);
+                  if (allEpisodesCompleted) {
+                    // If already completed, confirm before uncompleting
+                    setShowResetModal(true);
+                  } else {
+                    setIsUpdating(true);
+                    await toggleAllEpisodesCompletion();
+                    setIsUpdating(false);
+                  }
                 }}
               >
                 <FontAwesome
@@ -874,6 +882,19 @@ const toggleAllEpisodesCompletion = async () => {
                 />
                 <Text style={styles.actionText}>Completed</Text>
               </TouchableOpacity>
+
+              {/* Confirmation Modal for Reset */}
+              <ResetAlertModal
+                visible={showResetModal}
+                onCancel={() => setShowResetModal(false)}
+                onConfirm={async () => {
+                  setShowResetModal(false);
+                  setIsUpdating(true);
+                  await toggleAllEpisodesCompletion(); // This will now uncomplete the show
+                  setIsUpdating(false);
+                }}
+              />
+            </>
             </View>
 
             {/* season dropdown and rating */}
