@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
   /* action buttons */
   actionContainer: {
     flexDirection: "row",
-    justifyContent: Platform.OS === "ios" ? "space-evenly" : "space-between",
+    justifyContent: "space-evenly",
     alignItems: "center",
     backgroundColor: "#998498",
     paddingVertical: 10,
