@@ -82,10 +82,12 @@ const styles = StyleSheet.create({
         fontSize: 15,
         color: '#fff',
         fontWeight: 'bold',
+        fontFamily: 'Inter',
     },
     reviewText: {
         fontSize: 14,
         color: '#fff',
+        fontFamily: 'Inter',
     },
     reviewDivider: {
         backgroundColor: 'white',

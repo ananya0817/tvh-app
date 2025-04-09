@@ -8,7 +8,8 @@ const styles = StyleSheet.create({
     width: "100%",
     padding: 10,
     elevation: 10,
-    backgroundColor: "#625161",
+    backgroundColor: "#8d7a8e",
+    paddingBottom: 1,
   },
 
   showCard: {
@@ -42,21 +43,28 @@ const styles = StyleSheet.create({
   },
 
   searchInput: {
-    width: "90%",
+    width: "85%",
+    height: 40,
     borderWidth: 1,
     borderColor: "black",
     borderRadius: 10,
-    paddingHorizontal: 15,
+    paddingHorizontal: 10,
+    paddingVertical: 9,
     paddingBottom: 10,
     backgroundColor: "#AF9FAE",
     marginBottom: 10,
-    marginVertical: Platform.OS === "ios" ? 25 : 5,
-    alignSelf: "center",
+    marginVertical: 35,
+    //marginVertical: Platform.OS === "ios" ? 25 : 5,
+    //top: Platform.OS === "ios" ? 1 : 10,
+    //alignSelf: "center",
     textAlign: "center",
-    //alignItems: "center",
+    textAlignVertical: 'center',
+    alignItems: "center",
     fontWeight: "bold",
     fontSize: 16,
     flexDirection: "row",
+    justifyContent: "center",
+    fontFamily: 'Inter',
   },
   filterContainer: {
     flexDirection: "row",
@@ -79,6 +87,7 @@ const styles = StyleSheet.create({
   filterText: {
     fontSize: 16,
     color: "black",
+    fontFamily: 'Inter',
   },
   divider: {
     height: "80%",
@@ -105,9 +114,11 @@ const styles = StyleSheet.create({
   dropdownText: {
     fontSize: 16,
     color: "#000",
+    fontFamily: 'Inter',
   },
   header: {
     fontSize: 18,
+    color: "white",
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 10,
@@ -121,12 +132,14 @@ const styles = StyleSheet.create({
   selectedFilterText: {
     color: "#000",
     fontWeight: "bold",
+    fontFamily: 'Inter',
   },
   searchIcon: {
+    paddingTop: 27,
     position: "absolute",
     zIndex: 100,
     left: 50,
-    top: Platform.OS === "ios" ? 40: 27,
+    top: Platform.OS === "ios" ? 28: 27,
   },
 });
 
