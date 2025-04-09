@@ -255,6 +255,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#8d7a8e',
         padding: 15,
         paddingTop: 50,
+        paddingBottom: 1,
     },
     // top: {
     //     flexDirection: 'row',
@@ -270,6 +271,7 @@ const styles = StyleSheet.create({
         fontSize: 35,
         fontWeight: 'bold',
         color: 'white',
+        fontFamily: 'Inter',
     },
     signOutButton: {
         backgroundColor: '#6c5875',
@@ -281,6 +283,7 @@ const styles = StyleSheet.create({
     signOutText: {
         fontSize: 16,
         color: 'white',
+        fontFamily: 'Inter',
     },
     stats: {
         flexDirection: 'row',
@@ -297,10 +300,12 @@ const styles = StyleSheet.create({
         fontSize: 25,
         fontWeight: 'bold',
         color: 'white',
+        fontFamily: 'Inter',
     },
     statText: {
         fontSize: 20,
         color: 'white',
+        fontFamily: 'Inter',
     },
     divider: {
         backgroundColor: 'white',
@@ -314,11 +319,13 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: 'bold',
         color: 'white',
+        fontFamily: 'Inter',
         // marginBottom: 5,
     },
     showsBox: {
         marginTop:10,
         paddingHorizontal: 5,
+        height: 180,
     },
     tvItem: {
         width: 110,
@@ -336,6 +343,7 @@ const styles = StyleSheet.create({
         marginTop: 5,
         textAlign: "center",
         color: "#ffffff",
+        fontFamily: 'Inter',
     },
     reviews: {
         flexDirection: 'row',
@@ -346,6 +354,7 @@ const styles = StyleSheet.create({
     viewMore: {
         fontSize: 16,
         color: 'white',
+        fontFamily: 'Inter',
     },
 });
 

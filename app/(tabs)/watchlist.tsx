@@ -160,7 +160,7 @@ const fetchUserShows = async () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#625161",
+    backgroundColor: "#8d7a8e",
     paddingTop: 20,  
   },
   buttonContainer: {
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingBottom: 15,
-    backgroundColor: "#625161",
+    backgroundColor: "#8d7a8e",
   },
   button: {
     paddingVertical: 10,
@@ -181,6 +181,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     color: "black",
+    fontFamily: 'Inter',
   },
   showContainer: {
     flex: 1,
@@ -208,12 +209,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 50,
     fontSize: 16,
+    fontFamily: 'Inter',
   },
   emptyText: {
     color: 'white',
     textAlign: 'center',
     marginTop: 50,
     fontSize: 16,
+    fontFamily: 'Inter',
   },
   show: {
     flexDirection: "column",

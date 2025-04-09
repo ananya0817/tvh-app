@@ -156,8 +156,10 @@ export default function TVShowsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#625161",
-    paddingVertical: Platform.OS === "ios" ? 45: 10,
+    backgroundColor: "#8d7a8e",
+    paddingBottom: 1,
+    paddingVertical: 50,
+    //paddingVertical: Platform.OS === "ios" ? 35: 10,
   },
   loader: {
     flex: 1,
@@ -174,6 +176,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 5,
     color: "#ffffff",
+    fontFamily: 'Inter',
     // marginTop: Platform.OS === "ios" ? 15 : 0,
   },
   tvItem: {
@@ -192,5 +195,6 @@ const styles = StyleSheet.create({
     marginTop: 5,
     textAlign: "center",
     color: "#ffffff",
+    fontFamily: 'Inter',
   },
 });
