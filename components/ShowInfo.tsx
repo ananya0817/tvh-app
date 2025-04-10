@@ -654,10 +654,15 @@ const toggleAllEpisodesCompletion = async () => {
               )}
               <View style={styles.detailsContainer}>
                 <Text style={styles.title}>{showDetails?.name}</Text>
-                <Text style={styles.subtitle}>{showDetails?.number_of_seasons} Seasons</Text>
                 <Text style={styles.subtitle}>
-                  {showDetails?.first_air_date.substring(0, 4)} -{" "}
-                  {showDetails?.in_production ? "Present" : showDetails?.last_air_date.substring(0, 4)}
+                  {showDetails?.number_of_seasons === 1 
+                    ? `${showDetails?.number_of_seasons} Season` 
+                    : `${showDetails?.number_of_seasons} Seasons`}
+                </Text>
+                <Text style={styles.subtitle}>
+                  {showDetails?.first_air_date.substring(0, 4) === showDetails?.last_air_date.substring(0, 4)
+                    ? showDetails?.first_air_date.substring(0, 4)
+                    : `${showDetails?.first_air_date.substring(0, 4)} - ${showDetails?.in_production ? "Present" : showDetails?.last_air_date.substring(0, 4)}`}
                 </Text>
                 <Text style={styles.subtitle}>{showDetails?.genres.map((g) => g.name).join(" | ")}</Text>
                 <Text style={styles.subtitle}>
