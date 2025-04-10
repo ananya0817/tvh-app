@@ -208,7 +208,7 @@ export default function TabFiveScreen() {
 
             <Text style={styles.header}> Top Shows</Text>
             <View style={styles.showsBox }>
-                {loading ? (<Text>Loading...</Text>
+                {loading ? (<Text style={styles.loadText}>Loading...</Text>
                 ) : shows.length === 0 ? (
                     <Text>Star your favorite shows to showcase them! </Text>
                 ) : (
@@ -356,5 +356,12 @@ const styles = StyleSheet.create({
         color: 'white',
         fontFamily: 'Inter',
     },
+    loadText: {
+        color: 'white',
+        fontSize: 16,
+        fontFamily: 'Inter',
+        textAlign: 'center',
+        marginTop: 20,
+    }
 });
 

@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#8d7a8e",
-    paddingTop: 20,  
+    paddingTop: 20,
   },
   buttonContainer: {
     marginTop: Platform.OS === 'ios' ? 40 : 0,
@@ -188,7 +188,6 @@ const styles = StyleSheet.create({
     margin: 2,
     backgroundColor: 'none',
     borderRadius: 10,
-    padding: 0,
     alignItems: 'center',
     maxWidth: '33%', // Changed from 45% to match 3-column layout
   },
@@ -198,8 +197,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   row: {
-    justifyContent: 'space-between',
-    paddingHorizontal: 35,
+    //justifyContent: 'space-between',
+    paddingHorizontal: 25,
+    paddingVertical: 0,
   },
   listContent: {
     paddingBottom: 20,
