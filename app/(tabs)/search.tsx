@@ -13,13 +13,14 @@ export default function TabTwoScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    color: "#8d7a8e",
     alignItems: 'center',
     justifyContent: 'center',
-    paddingTop: Platform.OS === "ios" ? 10 : 0,
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
+    fontFamily: 'Inter',
   },
   separator: {
     marginVertical: 30,

@@ -95,12 +95,14 @@ const styles = StyleSheet.create({
     color: 'white',
     marginBottom: 50,
     textAlign: 'center',
+    fontFamily: 'Inter',
   },
   text: {
     color: 'white',
     fontSize: 20,
     marginBottom: 16,
     textAlign: 'center',
+    fontFamily: 'Inter',
   },
   formContainer: {
     backgroundColor: 'rgba(255, 255, 255, 0.15)',
@@ -116,6 +118,7 @@ const styles = StyleSheet.create({
     color: 'white',
     marginBottom: 5,
     fontSize: 14,
+    fontFamily: 'Inter',
   },
   input: {
     backgroundColor: 'white',
@@ -123,6 +126,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 12,
     width: '100%',
+    fontFamily: 'Inter',
   },
   button: {
     backgroundColor: '#222',
@@ -135,6 +139,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: '500',
+    fontFamily: 'Inter',
   },
   bottomTextContainer: {
     marginTop: 15,
@@ -142,6 +147,7 @@ const styles = StyleSheet.create({
   bottomText: {
     color: 'white',
     fontSize: 14,
+    fontFamily: 'Inter',
   },
   link: {
     textDecorationLine: 'underline',

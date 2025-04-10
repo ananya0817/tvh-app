@@ -61,18 +61,14 @@ const fetchShowDetails = async (showId: number): Promise<Show | null> => {
   }
 };
 
-  const fetchUserShows = async () => {
-    if(userId == "")
-    {
-      return;
-    }
+const fetchUserShows = async () => {
+    if(userId == "") {return;}
+    setLoading(true);
     try {
-      setLoading(true);
-
       const { data, error } = await supabase
         .from('UserShows')
         .select('show_id')
-        .eq('user_id', session?.user?.id || "")
+        .eq('user_id', userId)
         .eq(selected === 'toWatch' ? 'to_watch' : 'watching', true);
 
       if (error) throw error;
@@ -93,8 +89,10 @@ const fetchShowDetails = async (showId: number): Promise<Show | null> => {
   };
 
   useEffect(() => {
-    fetchUserShows();
-  }, [selected]);
+    if (userId!==""){
+      fetchUserShows();
+    }
+  }, [selected,userId]);
 
   return (
     <View style={styles.container}>
@@ -162,7 +160,7 @@ const fetchShowDetails = async (showId: number): Promise<Show | null> => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#625161",
+    backgroundColor: "#8d7a8e",
     paddingTop: 20,  
   },
   buttonContainer: {
@@ -171,7 +169,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingBottom: 15,
-    backgroundColor: "#625161",
+    backgroundColor: "#8d7a8e",
   },
   button: {
     paddingVertical: 10,
@@ -183,6 +181,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     color: "black",
+    fontFamily: 'Inter',
   },
   showContainer: {
     flex: 1,
@@ -210,12 +209,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 50,
     fontSize: 16,
+    fontFamily: 'Inter',
   },
   emptyText: {
     color: 'white',
     textAlign: 'center',
     marginTop: 50,
     fontSize: 16,
+    fontFamily: 'Inter',
   },
   show: {
     flexDirection: "column",

@@ -25,6 +25,7 @@ const reviewModalStyles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     color: "white",
+    fontFamily: 'Inter',
   },
   closeButton: {
     padding: 5,
@@ -43,6 +44,7 @@ const reviewModalStyles = StyleSheet.create({
   reviewText: {
     fontSize: 14,
     color: "white",
+    fontFamily: 'Inter',
   },
   reviewDate: {
     fontSize: 12,
@@ -55,6 +57,7 @@ const reviewModalStyles = StyleSheet.create({
     fontSize: 14,
     color: "white",
     marginBottom: 10,
+    fontFamily: 'Inter',
  },
 
   reviewListContainer: {
@@ -89,6 +92,7 @@ const reviewModalStyles = StyleSheet.create({
     color: "white",
     fontSize: 16,
     fontWeight: "bold",
+    fontFamily: 'Inter',
   },  
 });
 

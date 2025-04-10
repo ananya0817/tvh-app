@@ -18,7 +18,6 @@ export function Auth() {
       Alert.alert(error.message)
     }
     else {
-      Alert.alert('Logged in!')
       router.replace('/(tabs)');
     }
     setLoading(false)

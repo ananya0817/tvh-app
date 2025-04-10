@@ -7,6 +7,7 @@ import { router } from 'expo-router';
 import { Auth } from '../../components/Auth';
 import { useFocusEffect } from '@react-navigation/native';
 import {apiKey} from "@/components/api_links";
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 import axios from "axios";
 
 interface Show {
@@ -60,36 +61,36 @@ export default function TabFiveScreen() {
     }, [session]);
     const fetchUserShows = useCallback(async () => {
         if (!session?.user?.id) return;
-            try {
-                setLoading(true);
+        setLoading(true);
+        try {
+            const {data, error} = await supabase
+                .from('UserShows')
+                .select('show_id')
+                .eq('user_id', session.user.id)
+                .eq("favorite", true);
 
-                const {data, error} = await supabase
-                    .from('UserShows')
-                    .select('show_id')
-                    .eq('user_id', session.user.id)
-                    .eq("favorite", true);
+            if (error) throw error;
 
-                if (error) throw error;
+            const showIds = data?.map(item => item.show_id) || [];
+            const showsData = await Promise.all(showIds.map(fetchShowDetails));
+            const filtered = showsData.filter(
+                (show): show is Show => show !== null && show.poster_path !== null
+            );
+            setShows(filtered);
 
-                const showIds = data?.map(item => item.show_id) || [];
-                const showsData = await Promise.all(showIds.map(fetchShowDetails));
-
-                // console.log("Fetched Shows:", showsData);
-                setShows(showsData.filter((show): show is Show => show !== null && show.poster_path !== null));
-
-
-            } catch (error) {
-                console.error('Error fetching shows:', error);
-            } finally {
-                setLoading(false);
-            }
-        }, [favorite]);
+        } catch (error) {
+            console.error('Error fetching shows:', error);
+        } finally {
+            setLoading(false);
+        }
+    }, [session]);
     const fetchReviewCount = useCallback(async() => {
         if (!session?.user?.id) return;
         const { error, count } = await supabase
             .from("Reviews")
             .select("id", { count: "exact", head: true })
-            .eq("user_id", session.user.id);
+            .eq("user_id", session.user.id)
+            .not("review_text", "is", null);
 
         if (error) {
             console.error("Error fetching review count:", JSON.stringify(error, null, 2));
@@ -118,7 +119,8 @@ export default function TabFiveScreen() {
         const { error, count } = await supabase
             .from("UserShows")
             .select("id", { count: "exact", head: true })
-            .eq("user_id", session.user.id);
+            .eq("user_id", session.user.id)
+            .eq("completed", true);
 
         if (error) {
             console.error("Error fetching watch count:", error.message);
@@ -178,15 +180,15 @@ export default function TabFiveScreen() {
                 fetchCommentCount();
                 fetchWatchCount();
             }
-        }, [session, fetchUserShows, fetchReviewCount, fetchCommentCount, fetchWatchCount])
+        }, [session, fetchReviewCount, fetchCommentCount, fetchWatchCount])
     );
 
     return (
         <View style={styles.container}>
-            <View>
+            <View style={styles.headerTop}>
                 <Text style={styles.username}>{username}</Text>
                 <TouchableOpacity onPress={signOut} style={styles.signOutButton}>
-                    <Text style={styles.signOutText}>Sign Out</Text>
+                    <FontAwesome name="sign-out" size={25} color="white" />
                 </TouchableOpacity>
             </View>
             <View style={styles.stats}>
@@ -207,26 +209,32 @@ export default function TabFiveScreen() {
             <View style={styles.divider} />
 
             <Text style={styles.header}> Top Shows</Text>
-            <View style={styles.showsBox}>
-                <FlatList
-                    contentContainerStyle={{paddingBottom:100}}
-                    style={{maxHeight:180}}
-                    data={shows}
-                    keyExtractor={(tv) => tv.id.toString()}
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    renderItem={({ item: tv }) => (
-                        <TouchableOpacity onPress={() => handleShowPress(tv.id)}>
-                            <View style={styles.tvItem}>
-                                <Image
-                                    source={{ uri: `${IMAGE_BASE_URL}${tv.poster_path}` }}
-                                    style={styles.poster}
-                                />
-                                <Text numberOfLines={1} style={styles.tvTitle}>{tv.name}</Text>
-                            </View>
-                        </TouchableOpacity>
-                    )}
-                />
+            <View style={styles.showsBox }>
+                {loading ? (<Text>Loading...</Text>
+                ) : shows.length === 0 ? (
+                    <Text>Star your favorite shows to showcase them! </Text>
+                ) : (
+                    <FlatList
+                        contentContainerStyle={{paddingBottom:180}}
+                        style={{maxHeight:180}}
+                        data={shows}
+                        keyExtractor={(tv) => tv.id.toString()}
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        renderItem={({ item: tv }) => (
+                            <TouchableOpacity onPress={() => handleShowPress(tv.id)}>
+                                <View style={styles.tvItem}>
+                                    <Image
+                                        source={{ uri: `${IMAGE_BASE_URL}${tv.poster_path}` }}
+                                        style={styles.poster}
+                                    />
+                                </View>
+                            </TouchableOpacity>
+                        )}
+                    />
+                )}
+
+
             </View>
 
             <View style={styles.divider} />
@@ -248,33 +256,29 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#8d7a8e',
         padding: 15,
-        paddingTop: 50,
+        paddingTop: Platform.OS === "ios" ? 50 : 10,
+        paddingBottom: 1,
     },
-    // top: {
-    //     flexDirection: 'row',
-    //     justifyContent: 'space-between',
-    //     alignItems: 'center',
-    //     width: '100%',
-    //     paddingHorizontal: 20,
-    //     marginTop: 10,
-    // },
+    headerTop: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
     username: {
         marginTop: Platform.OS === 'ios' ? 25 : 10,
         marginLeft: 20,
         fontSize: 35,
         fontWeight: 'bold',
         color: 'white',
+        fontFamily: 'Inter',
     },
     signOutButton: {
-        backgroundColor: '#6c5875',
-        borderRadius: 5,
-        alignItems: 'center',
-        marginVertical: 10,
-        padding: 5,
+        marginRight: 10,
     },
     signOutText: {
         fontSize: 16,
         color: 'white',
+        fontFamily: 'Inter',
     },
     stats: {
         flexDirection: 'row',
@@ -291,10 +295,12 @@ const styles = StyleSheet.create({
         fontSize: 25,
         fontWeight: 'bold',
         color: 'white',
+        fontFamily: 'Inter',
     },
     statText: {
         fontSize: 20,
         color: 'white',
+        fontFamily: 'Inter',
     },
     divider: {
         backgroundColor: 'white',
@@ -308,12 +314,13 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: 'bold',
         color: 'white',
+        fontFamily: 'Inter',
         // marginBottom: 5,
     },
     showsBox: {
-        marginBottom: 15,
         marginTop:10,
         paddingHorizontal: 5,
+        height: 180,
     },
     tvItem: {
         width: 110,
@@ -331,6 +338,7 @@ const styles = StyleSheet.create({
         marginTop: 5,
         textAlign: "center",
         color: "#ffffff",
+        fontFamily: 'Inter',
     },
     reviews: {
         flexDirection: 'row',
@@ -341,6 +349,7 @@ const styles = StyleSheet.create({
     viewMore: {
         fontSize: 16,
         color: 'white',
+        fontFamily: 'Inter',
     },
 });
 

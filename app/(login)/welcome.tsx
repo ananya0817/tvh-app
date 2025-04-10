@@ -66,9 +66,10 @@ const styles = StyleSheet.create({
   },
   text: {
     color: 'white',
-    fontSize: 25,
+    fontSize: 23,
     marginBottom: 20,
     textAlign: 'center',
+    fontFamily: 'Inter',
   },
   button: {
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
@@ -83,6 +84,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 20,
     fontWeight: '500',
+    fontFamily: 'Inter',
   },
   secondaryButton: {
     backgroundColor: 'rgba(255, 255, 255, 0.2)',

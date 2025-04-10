@@ -55,12 +55,14 @@ const styles = StyleSheet.create({
     fontSize: 25,
     fontWeight: "bold",
     color: "white",
+    fontFamily: 'Inter',
   },
 
   subtitle: {
     fontSize: 16,
     color: "white",
     marginTop: 2,
+    fontFamily: 'Inter',
   },
 
   /* overview, networks, & progress bar */
@@ -76,12 +78,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#FFFFFF",
     marginBottom: 10,
+    fontFamily: 'Inter',
   },
 
   networks: {
     fontSize: 12,
     color: "#FFFFFF",
     marginBottom: 10,
+    fontFamily: 'Inter',
   },
 
   progressBarWrapper: {
@@ -106,12 +110,13 @@ const styles = StyleSheet.create({
     color: "white",
     marginLeft: 8,
     elevation: 3,
+    fontFamily: 'Inter',
   },
 
   /* action buttons */
   actionContainer: {
     flexDirection: "row",
-    justifyContent: Platform.OS === "ios" ? "space-evenly" : "space-between",
+    justifyContent: "space-evenly",
     alignItems: "center",
     backgroundColor: "#998498",
     paddingVertical: 10,
@@ -128,6 +133,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "white",
     marginTop: 5,
+    fontFamily: 'Inter',
   },
 
   /* seasons and episodes container */
@@ -173,6 +179,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "bold",
     color: "black",
+    fontFamily: 'Inter',
   },
 
   starsRow: {
@@ -219,6 +226,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "black",
     marginBottom: 5,
+    fontFamily: 'Inter',
   },
 
   episodeSecondLine: {
