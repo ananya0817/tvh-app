@@ -152,7 +152,7 @@ const Reviews: React.FC<ReviewsProps> = ({ current_user, more }) => {
         }, [fetchReviews])
     )
 
-    if (loading) return <Text>Loading...</Text>;
+    if (loading) return <Text style={styles.loadText}>Loading...</Text>;
     if (!reviews.length) return <Text>No reviews found.</Text>;
 
     return (
@@ -205,8 +205,8 @@ const styles = StyleSheet.create({
     reviewDivider: {
         backgroundColor: 'white',
         height: 1,
-        marginTop: 5,
-        marginBottom: 5,
+        marginTop: 15,
+        marginBottom: 0,
     },
     reviewContent: {
         flexDirection: "row",
@@ -217,11 +217,20 @@ const styles = StyleSheet.create({
         height: 110,
         borderRadius: 6,
         backgroundColor: "#ccc",
+        marginBottom: 1,
+        marginTop: -15,
       },
       reviewDetails: {
         flex: 1,
         justifyContent: "center",
-      },      
+      },
+      loadText: {  
+        color: 'white',
+        fontSize: 16,
+        fontFamily: 'Inter',
+        textAlign: 'center',
+        marginTop: 20,
+      },
 })
 
 export default Reviews;
