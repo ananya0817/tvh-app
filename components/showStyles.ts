@@ -10,6 +10,7 @@ const styles = StyleSheet.create({
     elevation: 10,
     backgroundColor: "#8d7a8e",
     paddingBottom: 1,
+    paddingTop: Platform.OS === 'ios' ? 25 : 0,
   },
 
   showCard: {
@@ -139,7 +140,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     zIndex: 100,
     left: 50,
-    top: Platform.OS === "ios" ? 28: 27,
+    top: Platform.OS === 'ios' ? 41 : 0,
   },
 });
 
