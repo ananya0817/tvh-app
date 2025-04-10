@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#8d7a8e',
         padding: 15,
-        paddingTop: 50,
+        paddingTop: Platform.OS === "ios" ? 50 : 10,
         paddingBottom: 1,
     },
     headerTop: {
