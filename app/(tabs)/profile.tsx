@@ -212,7 +212,7 @@ export default function TabFiveScreen() {
             <View style={styles.showsBox }>
                 {loading ? (<Text style={styles.loadText}>Loading...</Text>
                 ) : shows.length === 0 ? (
-                    <Text>Star your favorite shows to showcase them! </Text>
+                    <Text style={styles.noShowsText}>Star your favorite shows to showcase them! </Text>
                 ) : (
                     <FlatList
                         contentContainerStyle={{paddingBottom:180}}
@@ -357,6 +357,13 @@ const styles = StyleSheet.create({
         fontFamily: 'Inter',
         textAlign: 'center',
         marginTop: 20,
-    }
+    },
+    noShowsText: {
+        color: 'white',
+        fontSize: 16,
+        fontFamily: 'Inter',
+        textAlign: 'center',
+        marginTop: 20,
+    },
 });
 
