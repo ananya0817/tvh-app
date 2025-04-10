@@ -10,7 +10,7 @@ import {
   TextInput,
   Platform,
 } from "react-native";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { FontAwesome } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import styles from "./showInfoStyles";
@@ -19,8 +19,8 @@ import { useShowInfo } from "./useShowInfo";
 import { supabase } from "@/utils/supabase";
 import { BlurView } from "expo-blur"
 import WatchlistPopup from "./watchlistPopup";
-import { KeyboardAvoidingView } from "react-native";
-
+import { KeyboardAvoidingView} from "react-native";
+import AntDesign from '@expo/vector-icons/AntDesign';
 // review object
 interface Review {
   id: number;
@@ -59,7 +59,7 @@ const ShowInfo = () => {
   const { showId, userId1 } = useLocalSearchParams();
   const parsedShowId = Array.isArray(showId) ? showId[0] : showId;
   const userId = Array.isArray(userId1) ? userId1[0] : userId1;
-  const [selectedSeason, setSelectedSeason] = useState<number>(1);
+  const [selectedSeason, setSelectedSeason] = useState("1");
   const {
     showDetails,
     episodes,
@@ -641,6 +641,7 @@ const toggleAllEpisodesCompletion = async () => {
         ListHeaderComponent={
           <>
             {/* poster & overview */}
+            <AntDesign style={styles.backButton} name="arrowleft" size={25} color="white" onPress={() => router.back()}/>
             <View style={styles.headerContainer}>
               {showDetails?.poster_path && (
                 <Image
@@ -660,6 +661,7 @@ const toggleAllEpisodesCompletion = async () => {
                   IMDB: {showDetails?.vote_average ? Math.round(showDetails.vote_average * 10) : "N/A"}%
                 </Text>
               </View>
+        
             </View>
 
             {/* overview, networks, progress Bar */}
@@ -879,7 +881,8 @@ const toggleAllEpisodesCompletion = async () => {
             {/* season dropdown and rating */}
             <View style={styles.seasonsAndEpisodesContainer}>
               <View style={styles.pickerContainer}>
-                <Picker selectedValue={selectedSeason} onValueChange={(itemValue) => setSelectedSeason(Number(itemValue))} style={styles.picker}>
+                <Picker selectedValue={selectedSeason} onValueChange={(itemValue) => setSelectedSeason((itemValue))} style={styles.picker}>
+                  <Picker.Item label="Select a Season" value={"1"} enabled={false} />
                   {showDetails?.seasons.map((season) => (
                     <Picker.Item key={season.season_number} label={season.name} value={season.season_number.toString()} />
                   ))}
