@@ -202,13 +202,13 @@ export default function TabFiveScreen() {
                 </View>
                 <View style={styles.statBox}>
                     <Text style={styles.statNum}>{watchCount}</Text>
-                    <Text style={styles.statText}>shows</Text>
+                    <Text style={styles.statText}>completed</Text>
                 </View>
             </View>
             
             <View style={styles.divider} />
 
-            <Text style={styles.header}> Top Shows</Text>
+            <Text style={styles.header}> Favorite Shows</Text>
             <View style={styles.showsBox }>
                 {loading ? (<Text style={styles.loadText}>Loading...</Text>
                 ) : shows.length === 0 ? (
