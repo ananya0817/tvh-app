@@ -153,7 +153,7 @@ const Reviews: React.FC<ReviewsProps> = ({ current_user, more }) => {
     )
 
     if (loading) return <Text style={styles.loadText}>Loading...</Text>;
-    if (!reviews.length) return <Text>No reviews found.</Text>;
+    if (!reviews.length) return <Text style={styles.noReviewsText}>No reviews found.</Text>;
 
     return (
         <ScrollView style={styles.reviewContainer} contentContainerStyle={{ flexGrow: 1 }}>
@@ -225,6 +225,13 @@ const styles = StyleSheet.create({
         justifyContent: "center",
       },
       loadText: {  
+        color: 'white',
+        fontSize: 16,
+        fontFamily: 'Inter',
+        textAlign: 'center',
+        marginTop: 20,
+      },
+      noReviewsText: {
         color: 'white',
         fontSize: 16,
         fontFamily: 'Inter',
