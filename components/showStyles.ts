@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     marginVertical: 35,
     //marginVertical: Platform.OS === "ios" ? 25 : 5,
-    //top: Platform.OS === "ios" ? 1 : 10,
+    top: Platform.OS === "android" ? -17 : 0,
     //alignSelf: "center",
     textAlign: "center",
     textAlignVertical: 'center',
