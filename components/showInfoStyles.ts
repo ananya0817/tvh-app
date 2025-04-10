@@ -19,13 +19,21 @@ const styles = StyleSheet.create({
     zIndex: 999, 
   },
 
+
+  backButton: {
+    marginTop: Platform.OS === 'ios' ? 42 : 10,
+    padding: 0,
+    paddingLeft: 20,
+    marginBottom: 0,
+  },
+
   /* poster and overview */
   headerContainer: {
     flexDirection: "row",
     alignItems: "flex-start",
     width: "100%",
     padding: 15,
-    marginTop: Platform.OS === 'ios' ? 35 : 10,
+    marginTop: -7,
   },
 
   poster: {
@@ -43,7 +51,7 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    marginTop: 10,
+    marginTop: 5,
     fontSize: 25,
     fontWeight: "bold",
     color: "white",
@@ -112,7 +120,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#998498",
     paddingVertical: 10,
-    width: 415,
+    width: Platform.OS === "ios" ? "auto" : 415,
     marginTop: 10,
   },
 
@@ -139,8 +147,8 @@ const styles = StyleSheet.create({
 
   /* dropdown for seasons */
   pickerContainer: {
-    width: 180,
-    backgroundColor: "#D9D9D9",
+    width: Platform.OS === "ios" ? undefined : 180,
+    backgroundColor: Platform.OS === "ios" ? undefined : "#D9D9D9",
     marginBottom: 10,
     padding: 5,
     paddingLeft: 5,
@@ -148,8 +156,9 @@ const styles = StyleSheet.create({
 
   picker: {
     color: "black",
-    height: 55,
-    margin: -10,
+    height: Platform.OS === "ios" ? 140 : 55,
+    margin: Platform.OS === "ios" ? 0 : -10,
+    justifyContent: Platform.OS === "ios" ? "center" : undefined,
   },
 
   /* season rating & review */
