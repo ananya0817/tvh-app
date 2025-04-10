@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { Session } from "@supabase/supabase-js";
 import { supabase } from "@/utils/supabase";
@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#8d7a8e',
-    paddingTop: 60,
+    paddingTop: Platform.OS === "ios" ? 60 : 30,
   },
   title: {
     fontSize: 20,

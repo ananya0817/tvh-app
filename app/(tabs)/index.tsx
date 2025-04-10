@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#8d7a8e",
     paddingBottom: 1,
-    paddingVertical: 50,
+    paddingVertical: Platform.OS === "ios" ? 50: 10,
     //paddingVertical: Platform.OS === "ios" ? 35: 10,
   },
   loader: {
