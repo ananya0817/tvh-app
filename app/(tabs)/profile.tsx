@@ -7,6 +7,7 @@ import { router } from 'expo-router';
 import { Auth } from '../../components/Auth';
 import { useFocusEffect } from '@react-navigation/native';
 import {apiKey} from "@/components/api_links";
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 import axios from "axios";
 
 interface Show {
@@ -88,7 +89,8 @@ export default function TabFiveScreen() {
         const { error, count } = await supabase
             .from("Reviews")
             .select("id", { count: "exact", head: true })
-            .eq("user_id", session.user.id);
+            .eq("user_id", session.user.id)
+            .not("review_text", "is", null);
 
         if (error) {
             console.error("Error fetching review count:", JSON.stringify(error, null, 2));
@@ -178,15 +180,15 @@ export default function TabFiveScreen() {
                 fetchCommentCount();
                 fetchWatchCount();
             }
-        }, [session, fetchUserShows, fetchReviewCount, fetchCommentCount, fetchWatchCount])
+        }, [session, fetchReviewCount, fetchCommentCount, fetchWatchCount])
     );
 
     return (
         <View style={styles.container}>
-            <View>
+            <View style={styles.headerTop}>
                 <Text style={styles.username}>{username}</Text>
                 <TouchableOpacity onPress={signOut} style={styles.signOutButton}>
-                    <Text style={styles.signOutText}>Sign Out</Text>
+                    <FontAwesome name="sign-out" size={25} color="white" />
                 </TouchableOpacity>
             </View>
             <View style={styles.stats}>
@@ -254,17 +256,14 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#8d7a8e',
         padding: 15,
-        paddingTop: 50,
+        paddingTop: Platform.OS === "ios" ? 50 : 10,
         paddingBottom: 1,
     },
-    // top: {
-    //     flexDirection: 'row',
-    //     justifyContent: 'space-between',
-    //     alignItems: 'center',
-    //     width: '100%',
-    //     paddingHorizontal: 20,
-    //     marginTop: 10,
-    // },
+    headerTop: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
     username: {
         marginTop: Platform.OS === 'ios' ? 25 : 10,
         marginLeft: 20,
@@ -274,11 +273,7 @@ const styles = StyleSheet.create({
         fontFamily: 'Inter',
     },
     signOutButton: {
-        backgroundColor: '#6c5875',
-        borderRadius: 5,
-        alignItems: 'center',
-        marginVertical: 10,
-        padding: 5,
+        marginRight: 10,
     },
     signOutText: {
         fontSize: 16,

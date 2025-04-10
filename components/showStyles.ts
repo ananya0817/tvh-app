@@ -10,6 +10,7 @@ const styles = StyleSheet.create({
     elevation: 10,
     backgroundColor: "#8d7a8e",
     paddingBottom: 1,
+    paddingTop: Platform.OS === 'ios' ? 25 : 0,
   },
 
   showCard: {
@@ -55,7 +56,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     marginVertical: 35,
     //marginVertical: Platform.OS === "ios" ? 25 : 5,
-    //top: Platform.OS === "ios" ? 1 : 10,
+    top: Platform.OS === "android" ? -17 : 0,
     //alignSelf: "center",
     textAlign: "center",
     textAlignVertical: 'center',
@@ -139,7 +140,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     zIndex: 100,
     left: 50,
-    top: Platform.OS === "ios" ? 28: 27,
+    top: Platform.OS === 'ios' ? 41 : 0,
   },
 });
 
